@@ -1,68 +1,159 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-secondary-fixed: #10b981; /* emerald-500 equivalent for success */
+  
+  /* Custom Spacing */
+  --spacing-container-padding: 5%;
+  --spacing-gutter: 24px;
+  --spacing-md: 24px;
+  --spacing-lg: 48px;
+  --spacing-xl: 64px;
+
+  /* Typography */
+  --font-inter: "Inter", sans-serif;
+  --font-manrope: "Manrope", sans-serif;
+  --font-work-sans: "Work Sans", sans-serif;
+  
+  --font-size-h1: 64px;
+  --font-size-h2: 48px;
+  --font-size-h3: 32px;
+  --font-size-body-lg: 18px;
+  --font-size-body-md: 16px;
+  --font-size-body-sm: 14px;
+  --font-size-label-caps: 12px;
+}
+
+/* Custom properties for the design system */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --surface: #0a0b0c;
+  --surface-dim: #0a0b0c;
+  --surface-bright: #1f2022;
+  --surface-container-lowest: #050607;
+  --surface-container-low: #0e1012;
+  --surface-container: #14171a;
+  --surface-container-high: #1c2024;
+  --surface-container-highest: #282d33;
+  --on-surface: #f0f1f2;
+  --on-surface-variant: #94a3b8;
+  --outline: #475569;
+  --outline-variant: #1e293b;
+  --primary: #6366f1;
+  --on-primary: #ffffff;
+  --secondary: #38bdf8;
+  --on-secondary: #ffffff;
+  --background: #050607;
+  --on-background: #f8fafc;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+/* Typography Utility Classes */
+.text-label-caps {
+  font-size: var(--font-size-label-caps);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
-a:hover {
-  color: #535bf2;
+
+.text-tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.font-h1 { font-family: var(--font-manrope); font-weight: 800; }
+.font-h2 { font-family: var(--font-manrope); font-weight: 700; }
+.font-h3 { font-family: var(--font-manrope); font-weight: 600; }
+
+/* Custom glass morphism effect */
+.glass-card {
+  background: rgba(20, 23, 26, 0.4);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Hero gradient */
+.hero-gradient {
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
+    var(--background);
+}
+
+/* Material Icons configuration */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-container-lowest);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--outline);
+}
+
+/* Selection color */
+::selection {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+/* Global transitions */
+* {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--on-background);
+  font-family: 'Inter', 'Work Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Animation utilities */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: light) {
+/* Responsive fixes */
+@media (max-width: 768px) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+    --font-size-h1: 40px;
+    --font-size-h2: 32px;
+    --font-size-h3: 24px;
   }
 }
