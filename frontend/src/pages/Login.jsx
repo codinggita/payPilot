@@ -1,9 +1,54 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, Shield, Zap, Activity } from 'lucide-react';
+import { API_URL } from '../config';
 
 function Login() {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+        setError('');
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
+
+            // Success - for now just alert and redirect
+            // In a real app, you'd save the token
+            console.log('Login success:', data);
+            navigate('/dashboard');
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="bg-[#050505] text-white font-inter min-h-screen flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
             {/* Subtle background glow */}
@@ -32,11 +77,11 @@ function Login() {
 
                         {/* Hero Text */}
                         <div className="space-y-6">
-                            <h1 className="text-4xl font-bold text-white t">
+                            <h1 className="text-4xl font-bold text-white leading-tight tracking-tight">
                                 Analyze your wealth with <br />
                                 <span className="text-[#34d399]">institutional precision.</span>
                             </h1>
-                            <p className="text-lg text-white leading-relaxed">
+                            <p className="text-lg text-white/50 leading-relaxed">
                                 Access high-fidelity financial insights, automated reconciliation, and multi-wallet management in one secure interface.
                             </p>
                         </div>
@@ -95,7 +140,13 @@ function Login() {
                             </p>
                         </header>
 
-                        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                        <form className="space-y-6" onSubmit={handleSubmit}>
+                            {error && (
+                                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+                                    {error}
+                                </div>
+                            )}
+
                             <div className="space-y-2">
                                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="email">Email Address</label>
                                 <div className="relative group">
@@ -105,6 +156,9 @@ function Login() {
                                         id="email"
                                         placeholder="name@company.com"
                                         type="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
                                     />
                                 </div>
                             </div>
@@ -121,6 +175,9 @@ function Login() {
                                         id="password"
                                         placeholder="••••••••"
                                         type="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        required
                                     />
                                 </div>
                             </div>
@@ -134,9 +191,12 @@ function Login() {
                                 <label htmlFor="remember" className="text-xs text-white/40 select-none cursor-pointer">Remember me for 30 days</label>
                             </div>
 
-                            <button className="w-full bg-[#4f46e5] hover:bg-[#4338ca] text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-4">
-                                Sign In
-                                <ArrowRight className="w-4 h-4" />
+                            <button
+                                disabled={loading}
+                                className="w-full bg-[#4f46e5] hover:bg-[#4338ca] disabled:opacity-50 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-4"
+                            >
+                                {loading ? 'Signing in...' : 'Sign In'}
+                                {!loading && <ArrowRight className="w-4 h-4" />}
                             </button>
                         </form>
 
