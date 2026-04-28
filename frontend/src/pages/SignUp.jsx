@@ -1,9 +1,63 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, Shield, Zap, RefreshCw, Rocket, Sparkles, Hexagon } from 'lucide-react';
+import { API_URL } from '../config';
 
 function SignUp() {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+    });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+        setError('');
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        if (formData.password !== formData.confirmPassword) {
+            return setError('Passwords do not match');
+        }
+
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await fetch(`${API_URL}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: formData.fullName,
+                    email: formData.email,
+                    password: formData.password
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Registration failed');
+            }
+
+            // Success
+            navigate('/dashboard');
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="bg-[#050505] text-white font-inter min-h-screen flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
             {/* Subtle background glow */}
@@ -13,12 +67,12 @@ function SignUp() {
             </div>
 
             <main className="w-full max-w-[1200px] grid lg:grid-cols-2 min-h-[800px] bg-[#0d0d0d] rounded-[32px] overflow-hidden border border-white/5 shadow-2xl relative z-10">
-
+                
                 {/* Left Side: Product Showcase */}
                 <div className="hidden lg:flex flex-col justify-between p-16 bg-[#121212] relative overflow-hidden border-r border-white/5">
                     {/* Background decoration */}
                     <div className="absolute top-[-20%] right-[-10%] w-[400px] h-[400px] bg-white/[0.02] rounded-full blur-[80px]"></div>
-
+                    
                     <div className="relative z-10 space-y-12">
                         {/* Logo */}
                         <div className="flex items-center gap-3">
@@ -60,20 +114,16 @@ function SignUp() {
                     </div>
 
                     {/* Enterprise Card Showcase */}
-                    <motion.div
+                    <motion.div 
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.5, duration: 1 }}
                         className="relative z-10 mt-12 flex justify-center"
                     >
                         <div className="relative group">
-                            {/* Card Glow */}
                             <div className="absolute inset-0 bg-indigo-600/20 rounded-3xl blur-2xl group-hover:bg-indigo-600/30 transition-all"></div>
-
-                            {/* The Card */}
                             <div className="w-[380px] h-[220px] bg-gradient-to-br from-[#1c1c1c] to-[#0a0a0a] rounded-3xl border border-white/10 p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/[0.02] rounded-full -mr-16 -mt-16 blur-xl"></div>
-
                                 <div className="flex justify-between items-start relative z-10">
                                     <svg className="w-10 h-10 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                         <path d="M5 8.5C5 7.11929 6.11929 6 7.5 6C8.88071 6 10 7.11929 10 8.5C10 9.88071 8.88071 11 7.5 11C6.11929 11 5 9.88071 5 8.5Z" />
@@ -82,7 +132,6 @@ function SignUp() {
                                     </svg>
                                     <span className="text-xl font-bold text-white opacity-80">SpendSync</span>
                                 </div>
-
                                 <div className="space-y-4 relative z-10">
                                     <p className="text-xl font-medium tracking-[0.2em] text-white/90">4582 •••• •••• 9012</p>
                                     <div className="flex justify-between items-end">
@@ -111,16 +160,25 @@ function SignUp() {
                             </p>
                         </header>
 
-                        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                        <form className="space-y-6" onSubmit={handleSubmit}>
+                            {error && (
+                                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+                                    {error}
+                                </div>
+                            )}
+
                             <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="name">Full Name</label>
+                                <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="fullName">Full Name</label>
                                 <div className="relative group">
                                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors" />
-                                    <input
-                                        className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
-                                        id="name"
-                                        placeholder="John Doe"
-                                        type="text"
+                                    <input 
+                                        className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all" 
+                                        id="fullName" 
+                                        placeholder="John Doe" 
+                                        type="text" 
+                                        value={formData.fullName}
+                                        onChange={handleChange}
+                                        required
                                     />
                                 </div>
                             </div>
@@ -129,11 +187,14 @@ function SignUp() {
                                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="email">Email Address</label>
                                 <div className="relative group">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors" />
-                                    <input
-                                        className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
-                                        id="email"
-                                        placeholder="name@company.com"
-                                        type="email"
+                                    <input 
+                                        className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all" 
+                                        id="email" 
+                                        placeholder="name@company.com" 
+                                        type="email" 
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
                                     />
                                 </div>
                             </div>
@@ -143,41 +204,51 @@ function SignUp() {
                                     <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="password">Password</label>
                                     <div className="relative group">
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors" />
-                                        <input
-                                            className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
-                                            id="password"
-                                            placeholder="••••••••"
-                                            type="password"
+                                        <input 
+                                            className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all" 
+                                            id="password" 
+                                            placeholder="••••••••" 
+                                            type="password" 
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            required
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="confirm">Confirm Password</label>
+                                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="confirmPassword">Confirm Password</label>
                                     <div className="relative group">
                                         <RefreshCw className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors" />
-                                        <input
-                                            className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
-                                            id="confirm"
-                                            placeholder="••••••••"
-                                            type="password"
+                                        <input 
+                                            className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all" 
+                                            id="confirmPassword" 
+                                            placeholder="••••••••" 
+                                            type="password" 
+                                            value={formData.confirmPassword}
+                                            onChange={handleChange}
+                                            required
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-3 py-2">
-                                <input
-                                    type="checkbox"
-                                    id="terms"
-                                    className="w-5 h-5 rounded-md bg-white/5 border border-white/10 appearance-none checked:bg-indigo-600 checked:border-transparent transition-all cursor-pointer relative after:content-[''] after:absolute after:hidden after:left-[6px] after:top-[2px] after:w-[6px] after:h-[10px] after:border-white after:border-b-2 after:border-r-2 after:rotate-45"
+                                <input 
+                                    type="checkbox" 
+                                    id="terms" 
+                                    className="w-5 h-5 rounded-md bg-white/5 border border-white/10 appearance-none checked:bg-indigo-600 checked:border-transparent transition-all cursor-pointer relative after:content-[''] after:absolute after:hidden after:left-[6px] after:top-[2px] after:w-[6px] after:h-[10px] after:border-white after:border-b-2 after:border-r-2 after:rotate-45 peer-checked:after:block"
+                                    required
                                 />
                                 <label htmlFor="terms" className="text-xs text-white/40 leading-relaxed">
                                     I agree to the <span className="text-white/80 hover:underline cursor-pointer">Terms of Service</span> and <span className="text-white/80 hover:underline cursor-pointer">Privacy Policy</span>.
                                 </label>
                             </div>
 
-                            <button className="w-full bg-[#4f46e5] hover:bg-[#4338ca] text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] mt-4">
-                                Create Account
+                            <button 
+                                disabled={loading}
+                                className="w-full bg-[#4f46e5] hover:bg-[#4338ca] disabled:opacity-50 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] mt-4"
+                            >
+                                {loading ? 'Creating Account...' : 'Create Account'}
                             </button>
                         </form>
 
@@ -208,7 +279,7 @@ function SignUp() {
             </main>
 
             {/* Testimonial Floating Card */}
-            <motion.div
+            <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1, duration: 0.8 }}
@@ -216,9 +287,9 @@ function SignUp() {
             >
                 <div className="bg-[#121212]/80 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-2xl flex items-center gap-4 max-w-[320px]">
                     <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 flex-shrink-0">
-                        <img
-                            src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=100"
-                            alt="Sarah Chen"
+                        <img 
+                            src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=100" 
+                            alt="Sarah Chen" 
                             className="w-full h-full object-cover"
                         />
                     </div>
