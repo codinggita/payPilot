@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -23,17 +24,12 @@ function Landing() {
                 <div className="max-w-7xl mx-auto px-6 md:px-container-padding h-20 flex items-center justify-between">
                     <div className="flex items-center gap-12">
                         <span className="text-2xl font-h1 tracking-tighter text-on-surface">PayPilot</span>
-                        <div className="hidden md:flex items-center gap-8">
-                            <a className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors" href="#">Platform</a>
-                            <a className="text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors" href="#">Solutions</a>
-                            <a className="text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors" href="#">Pricing</a>
-                        </div>
                     </div>
                     <div className="flex items-center gap-6">
-                        <button className="hidden sm:block text-sm font-semibold text-on-surface hover:text-primary transition-colors">Log In</button>
-                        <button className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-full hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all active:scale-95">
+                        <Link to="/login" className="hidden sm:block text-sm font-semibold text-on-surface hover:text-primary transition-colors">Log In</Link>
+                        <Link to="/signup" className="px-5 py-2.5 bg-primary text-on-primary text-sm font-bold rounded-full hover:shadow-[0_0_20px_rgba(199,198,198,0.4)] transition-all active:scale-95">
                             Get Started
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </nav>
@@ -42,7 +38,7 @@ function Landing() {
                 {/* Hero Section */}
                 <section className="relative pt-40 pb-32 overflow-hidden hero-gradient">
                     <div className="max-w-7xl mx-auto px-6 md:px-container-padding relative z-10 text-center">
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.5 }}
@@ -51,8 +47,8 @@ function Landing() {
                             <span className="material-symbols-outlined text-[16px]">auto_awesome</span>
                             AI-Powered Financial Intelligence
                         </motion.div>
-                        
-                        <motion.h1 
+
+                        <motion.h1
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
@@ -62,7 +58,7 @@ function Landing() {
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Pilot Your Growth</span>
                         </motion.h1>
 
-                        <motion.p 
+                        <motion.p
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.4 }}
@@ -71,15 +67,15 @@ function Landing() {
                             PayPilot is the enterprise-grade reconciliation layer. We unify subscriptions, multi-program rewards, and vendor payments into one intelligent dashboard.
                         </motion.p>
 
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.6 }}
                             className="flex flex-col sm:flex-row items-center justify-center gap-4"
                         >
-                            <button className="w-full sm:w-auto px-8 py-4 bg-primary text-white font-bold rounded-2xl hover:shadow-[0_8px_30px_rgba(99,102,241,0.4)] transition-all active:scale-95">
+                            <Link to="/signup" className="w-full sm:w-auto px-8 py-4 bg-primary text-on-primary font-bold rounded-2xl hover:shadow-[0_8px_30px_rgba(199,198,198,0.4)] transition-all active:scale-95 text-center">
                                 Start Your Pilot
-                            </button>
+                            </Link>
                             <button className="w-full sm:w-auto px-8 py-4 glass-card text-on-surface font-bold rounded-2xl hover:bg-white/5 transition-all active:scale-95">
                                 Watch Demo
                             </button>
@@ -87,7 +83,7 @@ function Landing() {
                     </div>
 
                     {/* Bento Preview */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: 100 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.8 }}
@@ -106,7 +102,7 @@ function Landing() {
                             </div>
                             <div className="h-64 flex items-end justify-between gap-3">
                                 {[40, 55, 45, 75, 60, 85, 95].map((h, i) => (
-                                    <motion.div 
+                                    <motion.div
                                         key={i}
                                         initial={{ height: 0 }}
                                         animate={{ height: `${h}%` }}
@@ -152,14 +148,14 @@ function Landing() {
                             <h2 className="text-h2 font-h1 text-on-surface mb-4">Built for Financial Precision</h2>
                             <p className="text-on-surface-variant max-w-2xl mx-auto">Modern tools for modern finance teams. No more manual ledgers.</p>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {[
                                 { icon: 'subscriptions', title: 'Subscription Stack', desc: 'Identify zombie accounts and duplicate seats automatically.' },
                                 { icon: 'account_balance_wallet', title: 'Treasury Sync', desc: 'Real-time multi-bank and multi-wallet consolidation.' },
                                 { icon: 'security', title: 'Compliance Engine', desc: 'Automated tax categorization and PCI DSS Level 1 security.' }
                             ].map((feature, i) => (
-                                <motion.div 
+                                <motion.div
                                     key={i}
                                     variants={fadeInUp}
                                     initial="initial"
@@ -226,7 +222,7 @@ function Landing() {
 
                 {/* CTA Section */}
                 <section className="py-32 px-6">
-                    <motion.div 
+                    <motion.div
                         whileHover={{ scale: 1.01 }}
                         className="max-w-6xl mx-auto rounded-[48px] bg-primary p-12 md:p-24 relative overflow-hidden text-center"
                     >
@@ -237,9 +233,9 @@ function Landing() {
                             <h2 className="text-4xl md:text-6xl font-h1 text-white mb-8 tracking-tight">Ready to pilot your growth?</h2>
                             <p className="text-xl text-white/80 max-w-2xl mx-auto mb-12">Join 500+ modern enterprises automating their financial operations with PayPilot.</p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                                <button className="w-full sm:w-auto px-10 py-5 bg-white text-primary font-bold rounded-2xl hover:bg-slate-50 transition-all shadow-xl">
+                                <Link to="/signup" className="w-full sm:w-auto px-10 py-5 bg-white text-primary font-bold rounded-2xl hover:bg-slate-50 transition-all shadow-xl text-center">
                                     Get Started Free
-                                </button>
+                                </Link>
                                 <button className="w-full sm:w-auto px-10 py-5 bg-primary-container/20 text-white font-bold rounded-2xl border border-white/20 hover:bg-white/10 transition-all">
                                     Talk to Sales
                                 </button>
@@ -287,4 +283,4 @@ function Landing() {
     );
 }
 
-export default Landing;
+export default Landing;
