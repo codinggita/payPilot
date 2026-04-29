@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, FileText, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, Loader2, AlertCircle, Building2, CreditCard, Landmark } from 'lucide-react';
 
 const ManualUpload = ({ onUploadComplete }) => {
   const [uploading, setUploading] = useState(false);
@@ -10,8 +10,6 @@ const ManualUpload = ({ onUploadComplete }) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Validate file type
-    const validTypes = ['text/csv', 'application/pdf', '.csv', '.pdf'];
     const fileExtension = file.name.split('.').pop().toLowerCase();
     
     if (!['csv', 'pdf'].includes(fileExtension)) {
@@ -20,7 +18,6 @@ const ManualUpload = ({ onUploadComplete }) => {
       return;
     }
     
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       setError('File size must be less than 10MB');
       setTimeout(() => setError(null), 3000);
@@ -35,31 +32,37 @@ const ManualUpload = ({ onUploadComplete }) => {
     
     try {
       const token = localStorage.getItem('token');
+      
       const response = await fetch('/api/reconciliation/upload', {
         method: 'POST',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
         body: formData
       });
       
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-      
       const data = await response.json();
       
+      if (!response.ok) {
+        throw new Error(data.message || 'Upload failed');
+      }
+      
       setUploaded(true);
-      if (onUploadComplete && data.detectedSubscriptions) {
+      
+      if (onUploadComplete && data.detectedSubscriptions && data.detectedSubscriptions.length > 0) {
         onUploadComplete(data.detectedSubscriptions);
+        alert(`? Found ${data.detectedSubscriptions.length} new subscriptions!`);
+      } else if (data.detectedCount > 0) {
+        alert(`? Processed! Found ${data.detectedCount} potential subscriptions.`);
+      } else {
+        alert('File processed. No recurring subscriptions detected.');
       }
       
       setTimeout(() => setUploaded(false), 3000);
     } catch (error) {
       console.error('Upload error:', error);
-      setError('Failed to upload statement. Please try again.');
+      setError(error.message || 'Failed to upload statement. Please try again.');
       setTimeout(() => setError(null), 3000);
     } finally {
       setUploading(false);
-      // Clear the file input
       e.target.value = '';
     }
   };
@@ -132,10 +135,10 @@ const ManualUpload = ({ onUploadComplete }) => {
               CSV or PDF (Max 10MB)
             </p>
             <div className="flex items-center justify-center gap-4 mt-3 text-xs text-on-surface-variant">
-              <span>?? Chase</span>
-              <span>?? Bank of America</span>
-              <span>?? Amex</span>
-              <span>??? Others</span>
+              <span className="flex items-center gap-1"><Building2 className="w-3 h-3" /> Chase</span>
+              <span className="flex items-center gap-1"><Landmark className="w-3 h-3" /> Bank of America</span>
+              <span className="flex items-center gap-1"><CreditCard className="w-3 h-3" /> Amex</span>
+              <span className="flex items-center gap-1">More banks</span>
             </div>
           </>
         )}
@@ -145,3 +148,4 @@ const ManualUpload = ({ onUploadComplete }) => {
 };
 
 export default ManualUpload;
+

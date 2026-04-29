@@ -3,6 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
@@ -16,7 +19,41 @@ const plaidRoutes = require('./routes/plaid.routes');
 
 const app = express();
 
-// ========== CORS Configuration ==========
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+    }
+});
+
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['text/csv', 'application/pdf', '.csv', '.pdf'];
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (ext === '.csv' || ext === '.pdf') {
+            cb(null, true);
+        } else {
+            cb(new Error('Only CSV and PDF files are allowed'));
+        }
+    }
+});
+
+// Make upload available to routes
+app.locals.upload = upload;
+
+// CORS Configuration
 const corsOptions = {
     origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
     credentials: true,
@@ -25,34 +62,32 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 };
 
-// Apply CORS middleware
 app.use(cors(corsOptions));
-// =========================================
 
-// Security middleware (disable some helmet features for dev)
+// Security middleware
 app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
     crossOriginOpenerPolicy: false,
     contentSecurityPolicy: false
 }));
 
-// Rate limiting (relaxed for development)
+// Rate limiting
 const limiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 500, // Allow 500 requests per minute
+    windowMs: 60 * 1000,
+    max: 500,
     message: 'Too many requests, please try again later.',
     skip: () => process.env.NODE_ENV === 'development'
 });
 app.use('/api', limiter);
 
-// Body parsing middleware
+// Body parsing middleware (json only, not for file uploads)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static files for uploads
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(uploadDir));
 
-// Request logging (for debugging)
+// Request logging
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
     next();
