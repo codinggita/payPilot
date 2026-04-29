@@ -1,20 +1,92 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
 const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
+const subscriptionRoutes = require('./routes/subscription.routes');
+const transactionRoutes = require('./routes/transaction.routes');
+const rewardRoutes = require('./routes/reward.routes');
+const walletRoutes = require('./routes/wallet.routes');
+const reconciliationRoutes = require('./routes/reconciliation.routes');
+const gmailRoutes = require('./routes/gmail.routes');
+const plaidRoutes = require('./routes/plaid.routes');
 
 const app = express();
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// ========== CORS Configuration ==========
+const corsOptions = {
+    origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
+    credentials: true,
+    optionsSuccessStatus: 200,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+// =========================================
+
+// Security middleware (disable some helmet features for dev)
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: false,
+    contentSecurityPolicy: false
+}));
+
+// Rate limiting (relaxed for development)
+const limiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 500, // Allow 500 requests per minute
+    message: 'Too many requests, please try again later.',
+    skip: () => process.env.NODE_ENV === 'development'
+});
+app.use('/api', limiter);
+
+// Body parsing middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Static files for uploads
+app.use('/uploads', express.static('uploads'));
+
+// Request logging (for debugging)
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/rewards', rewardRoutes);
+app.use('/api/wallets', walletRoutes);
+app.use('/api/reconciliation', reconciliationRoutes);
+app.use('/api/gmail', gmailRoutes);
+app.use('/api/plaid', plaidRoutes);
 
 // Health check
 app.get('/', (req, res) => {
     res.status(200).json({ message: 'PayPilot API is running...' });
+});
+
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ message: `Route ${req.method} ${req.url} not found` });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+    console.error('Error:', err.stack);
+    res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });
 
 module.exports = app;
