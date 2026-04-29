@@ -1,19 +1,33 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "mongoose": "^9.5.0",
-    "nodemon": "^3.1.14"
-  }
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node src/index.js",
+        "dev": "nodemon src/index.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "bcrypt": "^6.0.0",
+        "cors": "^2.8.6",
+        "csv-parser": "^3.2.0",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "express-rate-limit": "^7.5.0",
+        "express-validator": "^7.2.1",
+        "google-auth-library": "^9.15.1",
+        "googleapis": "^144.0.0",
+        "helmet": "^8.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^9.5.0",
+        "multer": "^1.4.5-lts.1",
+        "node-cron": "^3.0.3",
+        "pdf-parse": "^1.1.1",
+        "plaid": "^33.0.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.14"
+    }
 }
