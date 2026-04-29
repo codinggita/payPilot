@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, Shield, Zap, Activity } from 'lucide-react';
+import { API_URL } from '../config';
 
 function Login() {
     const navigate = useNavigate();
@@ -23,8 +24,7 @@ function Login() {
         setError('');
 
         try {
-            // Use full URL with CORS headers
-            const response = await fetch('http://localhost:5000/api/auth/login', {
+            const response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ function Login() {
             if (data.token) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                console.log('? Login successful, token saved');
+                console.log('Login successful, token saved');
                 navigate('/dashboard');
             } else {
                 throw new Error('No token received');

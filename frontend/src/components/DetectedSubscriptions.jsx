@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Check, X, Loader2, Clock, DollarSign, Calendar } from 'lucide-react';
+import { Sparkles, Check, X, Loader2, Clock, DollarSign, Calendar, Mail, Landmark, FileText, Search } from 'lucide-react';
 
 const DetectedSubscriptions = ({ refreshTrigger }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -16,11 +16,20 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
       });
       
       if (response.ok) {
-        const data = await response.json();
-        setSuggestions(data);
+        const result = await response.json();
+        if (result.success && result.data) {
+          setSuggestions(result.data);
+        } else if (Array.isArray(result)) {
+          setSuggestions(result);
+        } else {
+          setSuggestions([]);
+        }
+      } else {
+        setSuggestions([]);
       }
     } catch (error) {
       console.error('Fetch suggestions error:', error);
+      setSuggestions([]);
     } finally {
       setLoading(false);
     }
@@ -43,7 +52,8 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
       
       if (response.ok) {
         setSuggestions(prev => prev.filter(s => s._id !== suggestionId));
-        alert('? Subscription added successfully!');
+        alert('Subscription added successfully!');
+        window.dispatchEvent(new Event('subscriptionsChanged'));
       }
     } catch (error) {
       console.error('Approve error:', error);
@@ -74,10 +84,10 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
   
   const getSourceIcon = (source) => {
     switch(source) {
-      case 'gmail': return '??';
-      case 'plaid': return '??';
-      case 'csv': return '??';
-      default: return '??';
+      case 'gmail': return <Mail className="w-3 h-3" />;
+      case 'plaid': return <Landmark className="w-3 h-3" />;
+      case 'csv': return <FileText className="w-3 h-3" />;
+      default: return <Search className="w-3 h-3" />;
     }
   };
   
@@ -98,13 +108,13 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
     );
   }
   
-  if (suggestions.length === 0) {
+  if (!suggestions || suggestions.length === 0) {
     return (
       <div className="bg-surface-container-low rounded-2xl p-8 text-center border border-outline-variant">
         <Sparkles className="w-12 h-12 mx-auto mb-3 text-on-surface-variant opacity-30" />
         <p className="text-on-surface-variant font-medium">No new subscriptions detected yet</p>
         <p className="text-sm text-on-surface-variant mt-1">
-          ?? Connect Gmail to scan receipts | ?? Upload bank statement | ?? Connect bank account
+          Connect Gmail to scan receipts | Upload bank statement | Connect bank account
         </p>
       </div>
     );
@@ -114,7 +124,7 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
         <Sparkles className="w-5 h-5 text-yellow-400" />
-        <h3 className="font-bold text-on-surface text-lg">? Detected Subscriptions</h3>
+        <h3 className="font-bold text-on-surface text-lg">Detected Subscriptions</h3>
         <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">
           {suggestions.length} new
         </span>
@@ -129,28 +139,28 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-3 flex-wrap">
-                  <span className="font-bold text-on-surface text-xl">{suggestion.data.merchant}</span>
+                  <span className="font-bold text-on-surface text-xl">{suggestion.data?.merchant || 'Unknown'}</span>
                   <span className="text-xs px-2 py-1 rounded-full bg-primary/20 text-primary flex items-center gap-1">
                     {getSourceIcon(suggestion.source)} {suggestion.source?.toUpperCase()}
                   </span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${getConfidenceColor(suggestion.data.confidence)} bg-white/5`}>
-                    ?? {suggestion.data.confidence}% confidence
+                  <span className={`text-xs px-2 py-1 rounded-full ${getConfidenceColor(suggestion.data?.confidence)} bg-white/5`}>
+                    Lock {suggestion.data?.confidence || 0}% confidence
                   </span>
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                   <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-green-400" />
                     <div>
                       <p className="text-xs text-on-surface-variant">Amount</p>
-                      <p className="text-sm font-bold text-white">${suggestion.data.amount}</p>
+                      <p className="text-sm font-bold text-white">${suggestion.data?.amount}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-primary" />
                     <div>
                       <p className="text-xs text-on-surface-variant">Billing</p>
-                      <p className="text-sm font-bold text-white">{suggestion.data.billingCycle}</p>
+                      <p className="text-sm font-bold text-white">{suggestion.data?.billingCycle}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -158,28 +168,10 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
                     <div>
                       <p className="text-xs text-on-surface-variant">Next Renewal</p>
                       <p className="text-sm font-bold text-white">
-                        {new Date(suggestion.data.nextRenewalDate).toLocaleDateString()}
+                        {suggestion.data?.nextRenewalDate ? new Date(suggestion.data.nextRenewalDate).toLocaleDateString() : 'N/A'}
                       </p>
                     </div>
                   </div>
-                  {suggestion.data.matchedTransactionIds?.length > 0 && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 text-blue-400">??</div>
-                      <div>
-                        <p className="text-xs text-on-surface-variant">Matched</p>
-                        <p className="text-sm font-bold text-blue-400">
-                          {suggestion.data.matchedTransactionIds.length} transactions
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="mt-4 pt-3 border-t border-white/10">
-                  <p className="text-xs text-on-surface-variant">
-                    ?? First detected: {new Date(suggestion.data.firstDetected).toLocaleDateString()} • 
-                    Last charged: {new Date(suggestion.data.lastDetected).toLocaleDateString()}
-                  </p>
                 </div>
               </div>
               
@@ -196,7 +188,7 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
                   onClick={() => handleApprove(suggestion._id)}
                   disabled={processing === suggestion._id}
                   className="p-2.5 rounded-xl bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors disabled:opacity-50"
-                  title="Approve and add to my subscriptions"
+                  title="Approve"
                 >
                   {processing === suggestion._id ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
