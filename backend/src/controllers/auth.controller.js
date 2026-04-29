@@ -1,8 +1,15 @@
 const User = require('../models/user.model');
+const jwt = require('jsonwebtoken');
+
+// Generate JWT Token
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: '30d',
+    });
+};
 
 // @desc    Register new user
 // @route   POST /api/auth/register
-// @access  Public
 exports.register = async (req, res) => {
     try {
         console.log('Registration attempt:', req.body);
@@ -26,9 +33,12 @@ exports.register = async (req, res) => {
         });
 
         if (user) {
-            console.log('User created:', user.email);
+            const token = generateToken(user._id);
+            console.log('User created with token:', token.substring(0, 50) + '...');
+            
             res.status(201).json({
                 message: 'User registered successfully',
+                token: token,
                 user: {
                     id: user._id,
                     fullName: user.fullName,
@@ -44,7 +54,6 @@ exports.register = async (req, res) => {
 
 // @desc    Login user
 // @route   POST /api/auth/login
-// @access  Public
 exports.login = async (req, res) => {
     try {
         console.log('Login attempt:', req.body.email);
@@ -68,9 +77,12 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        console.log('Login successful:', email);
+        const token = generateToken(user._id);
+        console.log('Login successful for:', email, 'Token generated:', token.substring(0, 50) + '...');
+
         res.status(200).json({
             message: 'Login successful',
+            token: token,
             user: {
                 id: user._id,
                 fullName: user.fullName,
