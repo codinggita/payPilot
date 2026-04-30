@@ -5,7 +5,6 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(null);
-  const hasFetched = useRef(false);
 
   const fetchSuggestions = async () => {
     setLoading(true);
@@ -17,6 +16,7 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
       
       if (response.ok) {
         const result = await response.json();
+        // Handle API response format
         if (result.success && result.data) {
           setSuggestions(result.data);
         } else if (Array.isArray(result)) {
@@ -24,8 +24,6 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
         } else {
           setSuggestions([]);
         }
-      } else {
-        setSuggestions([]);
       }
     } catch (error) {
       console.error('Fetch suggestions error:', error);
@@ -36,8 +34,6 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
   };
   
   useEffect(() => {
-    if (hasFetched.current && !refreshTrigger) return;
-    hasFetched.current = true;
     fetchSuggestions();
   }, [refreshTrigger]);
   
@@ -91,30 +87,24 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
     }
   };
   
-  const getConfidenceColor = (confidence) => {
-    if (confidence >= 80) return 'text-green-400';
-    if (confidence >= 60) return 'text-yellow-400';
-    return 'text-orange-400';
-  };
-  
   if (loading) {
     return (
-      <div className="bg-surface-container-low rounded-2xl p-8">
+      <div className="bg-[#1f2020] rounded-2xl p-8">
         <div className="flex justify-center py-8">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
         </div>
-        <p className="text-center text-on-surface-variant mt-2">Scanning for subscriptions...</p>
+        <p className="text-center text-slate-400 mt-2">Scanning for subscriptions...</p>
       </div>
     );
   }
   
-  if (!suggestions || suggestions.length === 0) {
+  if (suggestions.length === 0) {
     return (
-      <div className="bg-surface-container-low rounded-2xl p-8 text-center border border-outline-variant">
-        <Sparkles className="w-12 h-12 mx-auto mb-3 text-on-surface-variant opacity-30" />
-        <p className="text-on-surface-variant font-medium">No new subscriptions detected yet</p>
-        <p className="text-sm text-on-surface-variant mt-1">
-          Connect Gmail to scan receipts | Upload bank statement | Connect bank account
+      <div className="bg-[#1f2020] rounded-2xl p-8 text-center border border-white/5">
+        <Sparkles className="w-12 h-12 mx-auto mb-3 text-slate-500 opacity-30" />
+        <p className="text-slate-400 font-medium">No new subscriptions detected yet</p>
+        <p className="text-sm text-slate-500 mt-1">
+          Upload a bank statement CSV to detect subscriptions
         </p>
       </div>
     );
@@ -124,7 +114,7 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
         <Sparkles className="w-5 h-5 text-yellow-400" />
-        <h3 className="font-bold text-on-surface text-lg">Detected Subscriptions</h3>
+        <h3 className="font-bold text-white text-lg">Detected Subscriptions</h3>
         <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">
           {suggestions.length} new
         </span>
@@ -134,17 +124,17 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
         {suggestions.map(suggestion => (
           <div
             key={suggestion._id}
-            className="bg-gradient-to-r from-surface-container-high to-surface-container rounded-xl p-5 border border-primary/20 hover:border-primary/50 transition-all shadow-lg"
+            className="bg-[#1f2020]/60 rounded-xl p-5 border border-indigo-500/20 hover:border-indigo-500/50 transition-all shadow-lg"
           >
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-3 flex-wrap">
-                  <span className="font-bold text-on-surface text-xl">{suggestion.data?.merchant || 'Unknown'}</span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-primary/20 text-primary flex items-center gap-1">
+                  <span className="font-bold text-white text-xl">{suggestion.data?.merchant || 'Unknown'}</span>
+                  <span className="text-xs px-2 py-1 rounded-full bg-indigo-600/20 text-indigo-400 flex items-center gap-1">
                     {getSourceIcon(suggestion.source)} {suggestion.source?.toUpperCase()}
                   </span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${getConfidenceColor(suggestion.data?.confidence)} bg-white/5`}>
-                    Lock {suggestion.data?.confidence || 0}% confidence
+                  <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400">
+                    {suggestion.data?.confidence || 0}% confidence
                   </span>
                 </div>
                 
@@ -152,21 +142,21 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
                   <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-green-400" />
                     <div>
-                      <p className="text-xs text-on-surface-variant">Amount</p>
+                      <p className="text-xs text-slate-400">Amount</p>
                       <p className="text-sm font-bold text-white">${suggestion.data?.amount}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-primary" />
+                    <Calendar className="w-4 h-4 text-indigo-400" />
                     <div>
-                      <p className="text-xs text-on-surface-variant">Billing</p>
+                      <p className="text-xs text-slate-400">Billing</p>
                       <p className="text-sm font-bold text-white">{suggestion.data?.billingCycle}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-emerald-400" />
                     <div>
-                      <p className="text-xs text-on-surface-variant">Next Renewal</p>
+                      <p className="text-xs text-slate-400">Next Renewal</p>
                       <p className="text-sm font-bold text-white">
                         {suggestion.data?.nextRenewalDate ? new Date(suggestion.data.nextRenewalDate).toLocaleDateString() : 'N/A'}
                       </p>
@@ -180,7 +170,6 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
                   onClick={() => handleReject(suggestion._id)}
                   disabled={processing === suggestion._id}
                   className="p-2.5 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50"
-                  title="Reject"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -188,7 +177,6 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
                   onClick={() => handleApprove(suggestion._id)}
                   disabled={processing === suggestion._id}
                   className="p-2.5 rounded-xl bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors disabled:opacity-50"
-                  title="Approve"
                 >
                   {processing === suggestion._id ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
