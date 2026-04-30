@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mail, CheckCircle, AlertCircle, Loader2, Trash2, ExternalLink } from 'lucide-react';
+import { API_URL } from '../config';
 
 const ConnectGmail = ({ onConnected }) => {
   const [loading, setLoading] = useState(false);
@@ -11,7 +12,7 @@ const ConnectGmail = ({ onConnected }) => {
   useEffect(() => {
     if (hasChecked.current) return;
     hasChecked.current = true;
-    
+
     const checkConnection = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -19,11 +20,11 @@ const ConnectGmail = ({ onConnected }) => {
           setChecking(false);
           return;
         }
-        
-        const response = await fetch('/api/users/gmail-status', {
+
+        const response = await fetch(`${API_URL}/users/gmail-status`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           setConnected(data.connected);
@@ -36,9 +37,9 @@ const ConnectGmail = ({ onConnected }) => {
         setChecking(false);
       }
     };
-    
+
     checkConnection();
-    
+
     const params = new URLSearchParams(window.location.search);
     if (params.get('gmail') === 'connected') {
       // Refresh data after successful connection
@@ -47,7 +48,7 @@ const ConnectGmail = ({ onConnected }) => {
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, [onConnected]);
-  
+
   const handleConnect = async () => {
     setLoading(true);
     try {
@@ -57,13 +58,13 @@ const ConnectGmail = ({ onConnected }) => {
         window.location.href = '/login';
         return;
       }
-      
-      const response = await fetch('/api/gmail/auth-url', {
+
+      const response = await fetch(`${API_URL}/gmail/auth-url`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
+
       if (!response.ok) throw new Error('Failed to get auth URL');
-      
+
       const { authUrl } = await response.json();
       window.location.href = authUrl;
     } catch (error) {
@@ -73,20 +74,20 @@ const ConnectGmail = ({ onConnected }) => {
       setLoading(false);
     }
   };
-  
+
   const handleDisconnect = async () => {
     if (!confirm('Are you sure you want to disconnect Gmail? You will need to reconnect to continue scanning for subscriptions.')) {
       return;
     }
-    
+
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/users/gmail-disconnect', {
+      const response = await fetch(`${API_URL}/users/gmail-disconnect`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
+
       if (response.ok) {
         setConnected(false);
         setGmailEmail('');
@@ -102,7 +103,7 @@ const ConnectGmail = ({ onConnected }) => {
       setLoading(false);
     }
   };
-  
+
   if (checking) {
     return (
       <div className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant">
@@ -112,7 +113,7 @@ const ConnectGmail = ({ onConnected }) => {
       </div>
     );
   }
-  
+
   return (
     <div className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant transition-all hover:border-primary/30">
       <div className="flex items-center justify-between mb-4">
@@ -135,9 +136,9 @@ const ConnectGmail = ({ onConnected }) => {
           </span>
         )}
       </div>
-      
+
       <div className="border-t border-outline-variant my-4"></div>
-      
+
       {connected && gmailEmail ? (
         <>
           <div className="mb-4 p-3 bg-green-500/10 rounded-xl border border-green-500/20">
@@ -150,7 +151,7 @@ const ConnectGmail = ({ onConnected }) => {
               ? PayPilot will automatically scan this Gmail account for subscription receipts
             </p>
           </div>
-          
+
           <button
             onClick={handleDisconnect}
             disabled={loading}
@@ -173,7 +174,7 @@ const ConnectGmail = ({ onConnected }) => {
               <li>Subscription cancellations</li>
             </ul>
           </div>
-          
+
           <button
             onClick={handleConnect}
             disabled={loading}
@@ -193,7 +194,7 @@ const ConnectGmail = ({ onConnected }) => {
           </button>
         </>
       )}
-      
+
       {connected && (
         <p className="text-xs text-on-surface-variant text-center mt-3 flex items-center justify-center gap-1">
           <ExternalLink className="w-3 h-3" />

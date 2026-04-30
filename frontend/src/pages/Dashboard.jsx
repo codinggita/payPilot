@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Wallet, Gift, PiggyBank, AlertCircle, Calendar, Loader2, TrendingUp } from 'lucide-react';
+import { API_URL } from '../config';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -13,26 +14,26 @@ const Dashboard = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        
-        const statsRes = await fetch('/api/dashboard/stats', {
+
+        const statsRes = await fetch(`${API_URL}/dashboard/stats`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const statsData = await statsRes.json();
         if (statsData.success) setStats(statsData.data);
-        
-        const chartsRes = await fetch('/api/dashboard/charts', {
+
+        const chartsRes = await fetch(`${API_URL}/dashboard/charts`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const chartsData = await chartsRes.json();
         if (chartsData.success) setCharts(chartsData.data);
-        
+
       } catch (error) {
         console.error('Fetch dashboard error:', error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchDashboardData();
   }, []);
 
@@ -68,7 +69,7 @@ const Dashboard = () => {
               <p className="text-sm text-slate-400">Total Spend</p>
               <p className="text-2xl font-bold text-white">${stats?.totalSpend?.toFixed(2) || '0.00'}</p>
             </div>
-            
+
             <div className="bg-[#1f2020] rounded-xl p-5 border border-white/5">
               <div className="flex justify-between items-start mb-3">
                 <Calendar className="w-5 h-5 text-indigo-400" />
@@ -79,7 +80,7 @@ const Dashboard = () => {
                 <p className="text-xs text-yellow-400 mt-1">{stats.upcomingRenewals} renewing soon</p>
               )}
             </div>
-            
+
             <div className="bg-[#1f2020] rounded-xl p-5 border border-white/5">
               <div className="flex justify-between items-start mb-3">
                 <Gift className="w-5 h-5 text-amber-400" />
@@ -87,7 +88,7 @@ const Dashboard = () => {
               <p className="text-sm text-slate-400">Rewards Earned</p>
               <p className="text-2xl font-bold text-white">${stats?.rewardsEarned?.toFixed(2) || '0.00'}</p>
             </div>
-            
+
             <div className="bg-[#1f2020] rounded-xl p-5 border border-white/5">
               <div className="flex justify-between items-start mb-3">
                 <PiggyBank className="w-5 h-5 text-emerald-400" />

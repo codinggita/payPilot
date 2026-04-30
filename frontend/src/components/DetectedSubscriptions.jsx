@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Sparkles, Check, X, Loader2, Clock, DollarSign, Calendar, Mail, Landmark, FileText, Search } from 'lucide-react';
+import { API_URL } from '../config';
 
 const DetectedSubscriptions = ({ refreshTrigger }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -10,10 +11,10 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/subscriptions/suggestions', {
+      const response = await fetch(`${API_URL}/subscriptions/suggestions`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
-      
+
       if (response.ok) {
         const result = await response.json();
         // Handle API response format
@@ -32,20 +33,20 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchSuggestions();
   }, [refreshTrigger]);
-  
+
   const handleApprove = async (suggestionId) => {
     setProcessing(suggestionId);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/subscriptions/suggestions/${suggestionId}/approve`, {
+      const response = await fetch(`${API_URL}/subscriptions/suggestions/${suggestionId}/approve`, {
         method: 'POST',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
-      
+
       if (response.ok) {
         setSuggestions(prev => prev.filter(s => s._id !== suggestionId));
         alert('Subscription added successfully!');
@@ -58,16 +59,16 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
       setProcessing(null);
     }
   };
-  
+
   const handleReject = async (suggestionId) => {
     setProcessing(suggestionId);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/subscriptions/suggestions/${suggestionId}/reject`, {
+      const response = await fetch(`${API_URL}/subscriptions/suggestions/${suggestionId}/reject`, {
         method: 'DELETE',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
-      
+
       if (response.ok) {
         setSuggestions(prev => prev.filter(s => s._id !== suggestionId));
       }
@@ -77,16 +78,16 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
       setProcessing(null);
     }
   };
-  
+
   const getSourceIcon = (source) => {
-    switch(source) {
+    switch (source) {
       case 'gmail': return <Mail className="w-3 h-3" />;
       case 'plaid': return <Landmark className="w-3 h-3" />;
       case 'csv': return <FileText className="w-3 h-3" />;
       default: return <Search className="w-3 h-3" />;
     }
   };
-  
+
   if (loading) {
     return (
       <div className="bg-[#1f2020] rounded-2xl p-8">
@@ -97,7 +98,7 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
       </div>
     );
   }
-  
+
   if (suggestions.length === 0) {
     return (
       <div className="bg-[#1f2020] rounded-2xl p-8 text-center border border-white/5">
@@ -109,7 +110,7 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
@@ -119,7 +120,7 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
           {suggestions.length} new
         </span>
       </div>
-      
+
       <div className="grid grid-cols-1 gap-4">
         {suggestions.map(suggestion => (
           <div
@@ -137,7 +138,7 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
                     {suggestion.data?.confidence || 0}% confidence
                   </span>
                 </div>
-                
+
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                   <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-green-400" />
@@ -164,7 +165,7 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex gap-2 ml-4">
                 <button
                   onClick={() => handleReject(suggestion._id)}

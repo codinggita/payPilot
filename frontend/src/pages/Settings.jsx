@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Loader2, CheckCircle, Shield, Bell, Globe, Sun, Moon, Key, Save, Copy, RefreshCw, X, Eye, EyeOff } from 'lucide-react';
+import { API_URL } from '../config';
 
 const SettingToggle = ({ label, desc, checked, onChange, disabled }) => (
     <div className="flex items-center justify-between py-3">
@@ -10,16 +11,15 @@ const SettingToggle = ({ label, desc, checked, onChange, disabled }) => (
             <p className="text-[10px] text-slate-500 font-medium">{desc}</p>
         </div>
         <label className="relative inline-flex items-center cursor-pointer">
-            <input 
-                type="checkbox" 
-                className="sr-only peer" 
+            <input
+                type="checkbox"
+                className="sr-only peer"
                 checked={checked}
                 onChange={onChange}
                 disabled={disabled}
             />
-            <div className={`w-10 h-5 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-white after:rounded-full after:h-4 after:w-4 after:transition-all ${
-                checked ? 'bg-indigo-600' : 'bg-white/10'
-            }`}></div>
+            <div className={`w-10 h-5 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-white after:rounded-full after:h-4 after:w-4 after:transition-all ${checked ? 'bg-indigo-600' : 'bg-white/10'
+                }`}></div>
         </label>
     </div>
 );
@@ -61,10 +61,10 @@ function Settings() {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/users/settings', {
+            const response = await fetch(`${API_URL}/users/settings`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             if (response.ok) {
                 const result = await response.json();
                 if (result.success && result.data) {
@@ -91,10 +91,10 @@ function Settings() {
     const handleSaveSettings = async () => {
         setSaving(true);
         setMessage(null);
-        
+
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/users/settings', {
+            const response = await fetch(`${API_URL}/users/settings`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ function Settings() {
                     twoFactorAuth: settings.twoFactorAuth
                 })
             });
-            
+
             if (response.ok) {
                 setMessage({ type: 'success', text: 'Settings saved successfully!' });
                 setTimeout(() => setMessage(null), 3000);
@@ -163,20 +163,20 @@ function Settings() {
     const handleChangePassword = async () => {
         setPasswordError('');
         setPasswordSuccess('');
-        
+
         if (passwordData.newPassword !== passwordData.confirmPassword) {
             setPasswordError('Passwords do not match');
             return;
         }
-        
+
         if (passwordData.newPassword.length < 6) {
             setPasswordError('Password must be at least 6 characters');
             return;
         }
-        
+
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/users/profile', {
+            const response = await fetch(`${API_URL}/users/profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -187,9 +187,9 @@ function Settings() {
                     newPassword: passwordData.newPassword
                 })
             });
-            
+
             const data = await response.json();
-            
+
             if (response.ok) {
                 setPasswordSuccess('Password changed successfully!');
                 setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -232,11 +232,10 @@ function Settings() {
 
                     {/* Message Alert */}
                     {message && (
-                        <div className={`p-4 rounded-xl flex items-center gap-3 ${
-                            message.type === 'success' 
-                                ? 'bg-green-500/10 border border-green-500/20 text-green-400' 
+                        <div className={`p-4 rounded-xl flex items-center gap-3 ${message.type === 'success'
+                                ? 'bg-green-500/10 border border-green-500/20 text-green-400'
                                 : 'bg-red-500/10 border border-red-500/20 text-red-400'
-                        }`}>
+                            }`}>
                             <CheckCircle className="w-4 h-4" />
                             {message.text}
                         </div>
@@ -256,11 +255,10 @@ function Settings() {
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`px-2 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all border-b-2 ${
-                                    activeTab === tab 
-                                        ? 'text-indigo-400 border-indigo-500' 
+                                className={`px-2 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all border-b-2 ${activeTab === tab
+                                        ? 'text-indigo-400 border-indigo-500'
                                         : 'text-slate-500 border-transparent hover:text-slate-300'
-                                }`}
+                                    }`}
                             >
                                 {tab}
                             </button>
@@ -281,9 +279,9 @@ function Settings() {
                                             Account Information
                                         </h3>
                                         <div className="space-y-2">
-                                            <SettingToggle 
-                                                label="Auto-Detect Subscriptions" 
-                                                desc="Automatically scan for recurring payments from uploaded statements and Gmail receipts" 
+                                            <SettingToggle
+                                                label="Auto-Detect Subscriptions"
+                                                desc="Automatically scan for recurring payments from uploaded statements and Gmail receipts"
                                                 checked={settings.autoDetectSubscriptions}
                                                 onChange={() => setSettings(prev => ({ ...prev, autoDetectSubscriptions: !prev.autoDetectSubscriptions }))}
                                             />
@@ -300,23 +298,21 @@ function Settings() {
                                             <p className="text-sm font-bold text-white mb-1">Interface Theme</p>
                                             <p className="text-[10px] text-slate-500 font-medium mb-4">Choose your preferred interface style</p>
                                             <div className="flex bg-white/5 p-1 rounded-xl border border-white/5">
-                                                <button 
+                                                <button
                                                     onClick={() => handleThemeChange('light')}
-                                                    className={`px-5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
-                                                        settings.theme === 'light' 
-                                                            ? 'bg-white text-slate-900 shadow-lg' 
+                                                    className={`px-5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${settings.theme === 'light'
+                                                            ? 'bg-white text-slate-900 shadow-lg'
                                                             : 'text-slate-500 hover:text-white'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     <Sun className="w-3 h-3" /> Light
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => handleThemeChange('dark')}
-                                                    className={`px-5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
-                                                        settings.theme === 'dark' 
-                                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                                                    className={`px-5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${settings.theme === 'dark'
+                                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
                                                             : 'text-slate-500 hover:text-white'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     <Moon className="w-3 h-3" /> Dark
                                                 </button>
@@ -337,9 +333,9 @@ function Settings() {
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <code className="flex-1 bg-black/40 px-5 py-3 rounded-xl font-mono text-indigo-300 text-sm overflow-x-auto border border-white/5 tracking-wider">
-                                                    {showApiKey ? settings.apiKey : 'sk_live_••••••••••••••••'}
+                                                    {showApiKey ? settings.apiKey : 'sk_live_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'}
                                                 </code>
-                                                <button 
+                                                <button
                                                     onClick={handleCopyApiKey}
                                                     className="text-slate-500 hover:text-white transition-colors relative"
                                                     title="Copy API Key"
@@ -350,14 +346,14 @@ function Settings() {
                                                         <Copy className="w-4 h-4" />
                                                     )}
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => setShowApiKey(!showApiKey)}
                                                     className="text-slate-500 hover:text-white transition-colors"
                                                     title={showApiKey ? "Hide API Key" : "Show API Key"}
                                                 >
                                                     {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={handleRegenerateKey}
                                                     className="text-slate-500 hover:text-rose-400 transition-colors"
                                                     title="Regenerate API Key"
@@ -366,7 +362,7 @@ function Settings() {
                                                 </button>
                                             </div>
                                         </div>
-                                        <button 
+                                        <button
                                             onClick={handleRegenerateKey}
                                             className="w-full py-4 border-2 border-dashed border-white/5 rounded-2xl text-slate-500 hover:text-white hover:border-indigo-500/30 hover:bg-white/[0.02] transition-all text-xs font-black uppercase tracking-widest"
                                         >
@@ -384,33 +380,33 @@ function Settings() {
                                         Alerts & Notifications
                                     </h3>
                                     <div className="space-y-2">
-                                        <SettingToggle 
-                                            label="Email Summaries" 
-                                            desc="Weekly financial health reports sent to your email" 
+                                        <SettingToggle
+                                            label="Email Summaries"
+                                            desc="Weekly financial health reports sent to your email"
                                             checked={settings.notifications?.email}
                                             onChange={() => handleNotificationChange('email')}
                                         />
-                                        <SettingToggle 
-                                            label="Push Notifications" 
-                                            desc="Instant alerts for important updates and security notifications" 
+                                        <SettingToggle
+                                            label="Push Notifications"
+                                            desc="Instant alerts for important updates and security notifications"
                                             checked={settings.notifications?.push}
                                             onChange={() => handleNotificationChange('push')}
                                         />
-                                        <SettingToggle 
-                                            label="Renewal Reminders" 
-                                            desc="Get notified 3 days before any subscription renews" 
+                                        <SettingToggle
+                                            label="Renewal Reminders"
+                                            desc="Get notified 3 days before any subscription renews"
                                             checked={settings.notifications?.renewalReminders}
                                             onChange={() => handleNotificationChange('renewalReminders')}
                                         />
-                                        <SettingToggle 
-                                            label="Weekly Digest" 
-                                            desc="Summary of your spending, savings, and detected subscriptions" 
+                                        <SettingToggle
+                                            label="Weekly Digest"
+                                            desc="Summary of your spending, savings, and detected subscriptions"
                                             checked={settings.notifications?.weeklyDigest !== false}
                                             onChange={() => handleNotificationChange('weeklyDigest')}
                                         />
-                                        <SettingToggle 
-                                            label="Marketing Updates" 
-                                            desc="Product news, feature announcements, and special offers" 
+                                        <SettingToggle
+                                            label="Marketing Updates"
+                                            desc="Product news, feature announcements, and special offers"
                                             checked={settings.notifications?.marketing}
                                             onChange={() => handleNotificationChange('marketing')}
                                         />
@@ -426,13 +422,13 @@ function Settings() {
                                         Security Settings
                                     </h3>
                                     <div className="space-y-4">
-                                        <SettingToggle 
-                                            label="Two-Factor Authentication" 
-                                            desc="Add an extra layer of security to your account" 
+                                        <SettingToggle
+                                            label="Two-Factor Authentication"
+                                            desc="Add an extra layer of security to your account"
                                             checked={settings.twoFactorAuth}
                                             onChange={() => setSettings(prev => ({ ...prev, twoFactorAuth: !prev.twoFactorAuth }))}
                                         />
-                                        
+
                                         {/* Change Password */}
                                         <div className="pt-4 border-t border-white/5">
                                             <div className="flex items-center justify-between py-3">
@@ -440,14 +436,14 @@ function Settings() {
                                                     <p className="text-sm font-bold text-white">Password</p>
                                                     <p className="text-[10px] text-slate-500 font-medium">Update your account password</p>
                                                 </div>
-                                                <button 
+                                                <button
                                                     onClick={() => setShowPasswordForm(!showPasswordForm)}
                                                     className="text-indigo-400 hover:text-indigo-300 text-xs font-bold uppercase tracking-widest"
                                                 >
                                                     {showPasswordForm ? 'Cancel' : 'Change Password'}
                                                 </button>
                                             </div>
-                                            
+
                                             {showPasswordForm && (
                                                 <div className="mt-4 p-4 bg-white/5 rounded-xl space-y-3">
                                                     {passwordError && (
@@ -494,7 +490,7 @@ function Settings() {
                                                 </div>
                                             )}
                                         </div>
-                                        
+
                                         {/* Active Sessions */}
                                         <div className="pt-4 border-t border-white/5">
                                             <p className="text-sm font-bold text-white mb-3">Active Sessions</p>
@@ -506,7 +502,7 @@ function Settings() {
                                                         </div>
                                                         <div>
                                                             <p className="text-xs font-bold text-white">Current Session</p>
-                                                            <p className="text-[10px] text-slate-500">Windows • Chrome • {new Date().toLocaleDateString()}</p>
+                                                            <p className="text-[10px] text-slate-500">Windows ï¿½ Chrome ï¿½ {new Date().toLocaleDateString()}</p>
                                                         </div>
                                                     </div>
                                                     <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">ACTIVE</span>
@@ -607,15 +603,15 @@ function Settings() {
                                         Quick Notifications
                                     </h3>
                                     <div className="space-y-2">
-                                        <SettingToggle 
-                                            label="Email Summaries" 
-                                            desc="Weekly financial health reports" 
+                                        <SettingToggle
+                                            label="Email Summaries"
+                                            desc="Weekly financial health reports"
                                             checked={settings.notifications?.email}
                                             onChange={() => handleNotificationChange('email')}
                                         />
-                                        <SettingToggle 
-                                            label="Renewal Reminders" 
-                                            desc="Get notified before subscriptions renew" 
+                                        <SettingToggle
+                                            label="Renewal Reminders"
+                                            desc="Get notified before subscriptions renew"
                                             checked={settings.notifications?.renewalReminders}
                                             onChange={() => handleNotificationChange('renewalReminders')}
                                         />
@@ -648,14 +644,14 @@ function Settings() {
                             Delete Account
                         </button>
                         <div className="flex items-center gap-6">
-                            <button 
+                            <button
                                 onClick={fetchSettings}
                                 className="text-slate-500 hover:text-white font-bold text-sm transition-colors flex items-center gap-2"
                             >
                                 <RefreshCw className="w-3 h-3" />
                                 Reset Changes
                             </button>
-                            <button 
+                            <button
                                 onClick={handleSaveSettings}
                                 disabled={saving}
                                 className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 hover:bg-indigo-500 transition-all active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"

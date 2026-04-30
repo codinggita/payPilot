@@ -7,6 +7,7 @@ import ConnectPlaid from '../components/ConnectPlaid';
 import ManualUpload from '../components/ManualUpload';
 import DetectedSubscriptions from '../components/DetectedSubscriptions';
 import CancellationModal from '../components/CancellationModal';
+import { API_URL } from '../config';
 
 const Subscriptions = () => {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -21,15 +22,15 @@ const Subscriptions = () => {
     billingCycle: 'monthly',
     nextRenewalDate: ''
   });
-  
+
   const fetchSubscriptions = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/subscriptions', {
+      const response = await fetch(`${API_URL}/subscriptions`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
-      
+
       if (response.ok) {
         const result = await response.json();
         if (result.success && result.data) {
@@ -46,28 +47,28 @@ const Subscriptions = () => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchSubscriptions();
-    
+
     const handleSubscriptionsChange = () => {
       fetchSubscriptions();
     };
     window.addEventListener('subscriptionsChanged', handleSubscriptionsChange);
-    
+
     return () => {
       window.removeEventListener('subscriptionsChanged', handleSubscriptionsChange);
     };
   }, []);
-  
+
   const handlePause = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/subscriptions/${id}/pause`, {
+      const response = await fetch(`${API_URL}/subscriptions/${id}/pause`, {
         method: 'PATCH',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
-      
+
       if (response.ok) {
         fetchSubscriptions();
         alert('Subscription paused. You will not receive renewal reminders.');
@@ -77,15 +78,15 @@ const Subscriptions = () => {
       alert('Failed to pause subscription');
     }
   };
-  
+
   const handleResume = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/subscriptions/${id}/resume`, {
+      const response = await fetch(`${API_URL}/subscriptions/${id}/resume`, {
         method: 'PATCH',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
-      
+
       if (response.ok) {
         fetchSubscriptions();
         alert('Subscription resumed. Renewal reminders are now active.');
@@ -95,21 +96,21 @@ const Subscriptions = () => {
       alert('Failed to resume subscription');
     }
   };
-  
+
   const handleCancelClick = (subscription) => {
     setSelectedSubscription(subscription);
     setShowCancelModal(true);
   };
-  
+
   const handleCancelConfirm = async () => {
     if (selectedSubscription) {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`/api/subscriptions/${selectedSubscription._id}`, {
+        const response = await fetch(`${API_URL}/subscriptions/${selectedSubscription._id}`, {
           method: 'DELETE',
           headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
-        
+
         if (response.ok) {
           fetchSubscriptions();
           alert('Subscription removed from PayPilot');
@@ -122,19 +123,19 @@ const Subscriptions = () => {
     setShowCancelModal(false);
     setSelectedSubscription(null);
   };
-  
+
   const handleAddManual = async (e) => {
     e.preventDefault();
-    
+
     // Validate inputs
     if (!newSubscription.merchant || !newSubscription.amount || !newSubscription.nextRenewalDate) {
       alert('Please fill in all fields');
       return;
     }
-    
+
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/subscriptions', {
+      const response = await fetch(`${API_URL}/subscriptions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,9 +148,9 @@ const Subscriptions = () => {
           nextRenewalDate: newSubscription.nextRenewalDate
         })
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         setShowManualForm(false);
         setNewSubscription({ merchant: '', amount: '', billingCycle: 'monthly', nextRenewalDate: '' });
@@ -163,17 +164,17 @@ const Subscriptions = () => {
       alert('Failed to add subscription');
     }
   };
-  
+
   const handleUploadComplete = (detected) => {
     if (detected?.length) {
       setRefreshSuggestions(prev => prev + 1);
     }
   };
-  
+
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
-  
+
   return (
     <div className="bg-[#121414] text-[#e3e2e2] font-['Work_Sans'] antialiased min-h-screen flex">
       <Sidebar />
@@ -192,17 +193,17 @@ const Subscriptions = () => {
               <Plus className="w-4 h-4" /> Add Manual
             </button>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <ConnectGmail onConnected={() => setRefreshSuggestions(prev => prev + 1)} />
             <ConnectPlaid onConnected={() => setRefreshSuggestions(prev => prev + 1)} />
             <ManualUpload onUploadComplete={handleUploadComplete} />
           </div>
-          
+
           <div className="mb-8">
             <DetectedSubscriptions refreshTrigger={refreshSuggestions} />
           </div>
-          
+
           {/* Manual Add Form */}
           {showManualForm && (
             <div className="bg-[#1f2020] rounded-2xl p-6 mb-8 border border-white/10 shadow-xl">
@@ -259,7 +260,7 @@ const Subscriptions = () => {
               </form>
             </div>
           )}
-          
+
           {/* Subscriptions List */}
           {loading ? (
             <div className="flex justify-center py-12">
@@ -297,7 +298,7 @@ const Subscriptions = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2">
                     {sub.status === 'active' ? (
                       <button
@@ -328,17 +329,17 @@ const Subscriptions = () => {
               ))}
             </div>
           )}
-          
+
           {/* Note */}
           <div className="mt-8 p-4 bg-[#1b1c1c] rounded-xl border border-white/5">
             <p className="text-sm text-slate-400 text-center">
-              Note: PayPilot helps you track subscriptions and sends renewal reminders. 
+              Note: PayPilot helps you track subscriptions and sends renewal reminders.
               To cancel a subscription, click the trash icon and follow the instructions.
             </p>
           </div>
         </main>
       </div>
-      
+
       {showCancelModal && selectedSubscription && (
         <CancellationModal
           subscription={selectedSubscription}
