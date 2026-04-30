@@ -1,178 +1,237 @@
-# PayPilot
+<p align="center">
+  <img src="assets/banner.png" alt="PayPilot Banner" width="100%">
+</p>
+
+# 🚀 PayPilot
+
+<div align="center">
 
 ![MERN](https://img.shields.io/badge/Stack-MERN-0ea5e9?style=for-the-badge)
-![Figma](https://img.shields.io/badge/Design-Figma-a855f7?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Prototype%20Ready-22c55e?style=for-the-badge)
-![Type](https://img.shields.io/badge/Project-Fintech%20SaaS-14b8a6?style=for-the-badge)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
+![Node](https://img.shields.io/badge/Node.js-22-339933?style=for-the-badge&logo=nodedotjs)
+![Express](https://img.shields.io/badge/Express-5-000000?style=for-the-badge&logo=express)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb)
+![Tailwind](https://img.shields.io/badge/Tailwind-CSS-06B6D4?style=for-the-badge&logo=tailwindcss)
+![Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?style=for-the-badge&logo=vercel)
+![Render](https://img.shields.io/badge/Deployed-Render-46E3B7?style=for-the-badge&logo=render)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-22c55e?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
-> ### 🚀 Project Snapshot
-> **PayPilot** is a Smart Payment Control and Reconciliation Platform built to help users manage subscriptions, understand rewards and cashback, reconcile bank transactions, and get a clearer view of their payment activity in one place.
->
-> It combines payment transparency, subscription control, wallet visibility, and statement reconciliation into a single modern dashboard experience.
+</div>
 
----
+> **Smart Payment Control & Reconciliation Platform** — Manage subscriptions, track rewards, reconcile bank statements, and control multiple wallets from one intelligent dashboard.
 
-PayPilot is a Smart Payment Control and Reconciliation Platform built to help users manage subscriptions, understand rewards and cashback, reconcile bank transactions, and get a clearer view of their payment activity in one place.
+<br/>
 
-This project is designed as a modern SaaS dashboard that solves multiple real-world payment-related issues through one unified product.
+## 📸 Preview
 
----
-
-## Project Overview
-
-The goal of PayPilot is to simplify payment management for users who deal with:
-
-- recurring subscriptions,
-- confusing cashback terms,
-- hidden reward visibility,
-- monthly bank statement reconciliation,
-- multiple wallets,
-- foreign transaction charges,
-- and unclear payment breakdowns.
-
-Instead of handling these issues separately across different apps and statements, PayPilot brings everything into a single dashboard.
+| Dashboard | Subscriptions | Transactions | Rewards |
+|:---:|:---:|:---:|:---:|
+| KPI Cards + Charts | Gmail Integration | Real CSV Data | Redeemable Points |
 
 ---
 
-## Problem Statements Used
+## 🌐 Live Demo
 
-This project is created by combining the following problem statements:
-
-1. **Why isn’t subscription pause logic built into auto-debit infrastructure?**
-2. **Why can’t users redeem credit card reward points easily?**
-3. **Why do payment apps have confusing cashback terms?**
-4. **Why do apartment maintenance payments lack itemized breakdowns?**
-5. **How do users reconcile bank statement transactions monthly?**
-6. **Why is reward visibility missing across UPI and wallet ecosystems?**
-7. **Why is foreign transaction pricing still confusing for consumers?**
-8. **How do users manage multiple payment app wallets?**
+| Service | URL |
+|---------|-----|
+| **Frontend** | [https://paypilot-woad.vercel.app](https://paypilot-woad.vercel.app) |
 
 ---
 
-## Problem Summary
+## 🎯 Problem Statement
 
-Users often struggle to:
+Users face **8 critical payment problems** that no single platform solves:
 
-- pause or control recurring auto-debits,
-- understand where rewards and cashback are coming from,
-- compare monthly bank transactions with app records,
-- track multiple wallets in one place,
-- and identify extra charges or hidden pricing.
-
-These issues create confusion, financial inefficiency, and a lack of transparency in everyday digital payments.
-
----
-
-## Proposed Solution
-
-PayPilot solves these problems by providing a centralized payment control dashboard where users can:
-
-- view and manage all subscriptions,
-- pause or resume recurring payments,
-- track cashback and reward points,
-- see itemized payment and maintenance breakdowns,
-- reconcile bank transactions with app records,
-- manage multiple wallets in one place,
-- and understand foreign transaction charges more clearly.
-
-The platform combines dashboards, charts, tables, and payment analytics to make financial activity easier to manage and review.
+| # | Problem | Solution |
+|---|---------|----------|
+| 1 | Missing Subscription Pause Logic | Built-in tracking and step-by-step guides for pausing auto-debits. |
+| 2 | Difficult Reward Redemption | Unified dashboard for tracking and redeeming points easily. |
+| 3 | Confusing Cashback Terms | Transparent tracking of rewards, cashback, and miles. |
+| 4 | Opaque Maintenance Billing | Itemized breakdowns for recurring service payments. |
+| 5 | Tedious Bank Reconciliation | Automated CSV parsing with high-accuracy pattern detection. |
+| 6 | Low Reward Visibility | Unified view across UPI and multiple wallet ecosystems. |
+| 7 | Complex Foreign Pricing | Simplified tracking of international transaction costs. |
+| 8 | Fragmented Wallet Management | Single dashboard to control and compare multiple payment app wallets. |
 
 ---
 
-## ✨ Core Features
+## ✨ Key Features
 
-| Module | Description |
-|---|---|
-| Authentication | Secure login, signup, and profile management |
-| Overview Dashboard | Summary cards, charts, and spending insights |
-| Subscriptions | Pause, resume, and monitor recurring payments |
-| Rewards | Track cashback, points, and reward visibility |
-| Transactions | Filter, search, and review transaction history |
-| Reconciliation | Upload statements and match payment records |
-| Wallets | Manage multiple payment app wallets |
-| Foreign Charges | View pricing and transaction clarity |
-| Settings | Manage notifications and user preferences |
+### 🔐 Authentication & Security
+- **JWT-based Authentication**: Secure token management with 30-day expiry.
+- **Bcrypt Hashing**: Industry-standard password protection.
+- **Protected Routes**: Middleware-secured API endpoints.
+- **Security Headers**: Hardened with Helmet and rate-limiting protection.
 
----
+### 📧 Gmail Integration
+- **OAuth 2.0 Flow**: Secure, verified connection to your Gmail account.
+- **Auto-Scanning**: Intelligent receipt detection for subscription tracking.
+- **One-Click Sync**: Easily connect or disconnect your account at any time.
 
-## Tech Stack
+### 📊 CSV Bank Statement Processing
+- **Drag-and-Drop**: Seamless upload for bank statements in CSV format.
+- **Pattern Detection**: Advanced algorithm with **70-95% confidence scoring**.
+- **Auto-Categorization**: Intelligently identifies merchants and categories.
+- **Subscription Suggestions**: Automated recurring payment detection for approval.
 
-This project uses the **MERN stack**:
+### 💳 Subscription Management
+- **Centralized Dashboard**: Track every recurring payment in one place.
+- **Pause/Resume Tracking**: Instant status updates for your subscriptions.
+- **Cancellation Guides**: Step-by-step instructions for Netflix, Spotify, Amazon Prime, and more.
 
-- **MongoDB** – Stores users, subscriptions, transactions, rewards, and wallet data
-- **Express.js** – Handles APIs and server-side logic
-- **React.js** – Builds the interactive frontend dashboard
-- **Node.js** – Runs the backend environment and business logic
+### 📈 Dashboard Analytics
+- **Real-Time KPIs**: Track Total Spend, Active Subscriptions, Rewards, and Savings.
+- **Dynamic Charts**: Monthly spending trends and category breakdown visualizations.
+- **Action Alerts**: Notifications for pending reconciliations and renewals.
 
-### Frontend Tools
+### 🔄 Transaction Management
+- **Real-World Data**: Processed from your actual bank statements (no mock data).
+- **Advanced Filters**: Search by status, category, or merchant.
+- **Export Support**: One-click CSV export for your filtered transaction data.
 
-- React Router
-- Tailwind CSS
-- Recharts
-- Lucide React
-- shadcn/ui
+### 🏆 Rewards Tracking
+- **Unified Tracker**: Monitor points, cashback, and miles from all sources.
+- **Bulk Redemption**: Unified "Redeem Rewards" interface.
+- **Performance History**: Interactive charts with 6-month and 1-year toggles.
 
-### Backend Tools
+### 👛 Multi-Wallet Management
+- **Glassmorphism UI**: Beautifully designed wallet cards with grid/list toggles.
+- **Compare View**: Side-by-side table for liquidity comparison across wallets.
+- **Total Liquidity**: Real-time aggregation of all your digital assets.
 
-- Express.js
-- JWT Authentication
-- bcrypt
-- MongoDB Mongoose
-- Multer for statement upload
-- Optional cron jobs / scheduled tasks
-
----
-
-## Figma Design
-
-The UI/UX prototype for this project was first designed in Figma.
-
-- **Figma Design Link:** https://www.figma.com/design/hrkpbXgWoFl6iuThOkYgso/Untitled?node-id=0-1&t=HKkoUgRnmv9E5usv-1
-
-- **Figma Prototype Link:** https://www.figma.com/proto/hrkpbXgWoFl6iuThOkYgso/Untitled?page-id=0%3A1&node-id=10-14&viewport=324%2C616%2C0.21&t=o3mqsTrgA0Ygo8Nk-1&scaling=contain&content-scaling=responsive
+### ⚙️ Settings & Customization
+- **Profile Management**: Update your personal information and preferences.
+- **Notification Control**: Granular settings for Email, Push, and Reminders.
+- **API Key Management**: Securely manage, regenerate, and toggle API key visibility.
+- **Security Center**: 2FA toggle, active session management, and password reset.
 
 ---
 
-## Project Workflow
+## 🛠️ Tech Stack
 
-1. User signs in or creates an account.
-2. User lands on the dashboard overview.
-3. User adds subscriptions, wallets, and transactions.
-4. User uploads bank statements for reconciliation.
-5. System compares and matches payment records.
-6. User checks rewards, cashback, and pending items.
-7. User manages recurring payments and monitors savings.
+### Frontend
+- **Core**: React 18, Vite
+- **Styling**: Tailwind CSS, Framer Motion
+- **Icons**: Lucide Icons
+- **Navigation**: React Router DOM v6
 
----
-
-## Why This Project
-
-This project was selected because it addresses common payment issues that many users face but rarely get solved in one platform. It is useful, practical, and strong enough to demonstrate full-stack project planning, UI design, and product thinking.
-
----
-
-## Project Status
-
-- UI/UX prototype: Completed
-- Frontend structure: In progress / completed
-- Backend integration: Planned
-- Database integration: Planned
-- Authentication: Planned / in progress
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express 5
+- **Database**: MongoDB Atlas (Mongoose ODM)
+- **Security**: JWT, bcrypt, Helmet, Express Rate Limit
+- **Services**: Gmail API, Plaid (Sandbox), CSV Parser, Multer
 
 ---
 
-## Future Scope
+## 📊 Database Schema (7 Collections)
 
-- Real bank API integration
-- Real payment gateway integration
-- Statement auto-import
-- Smart duplicate charge detection
-- AI-based spending insights
-- Email and push notifications
-- Role-based access for admin and users
+```mermaid
+graph TD
+    Users --> Subscriptions
+    Users --> Wallets
+    Users --> Rewards
+    Users --> Transactions
+    Transactions --> Reconciliation
+    Subscriptions --> Suggestions
+```
 
 ---
 
-## Conclusion
+## 🔗 API Endpoints (30+ Endpoints)
 
-PayPilot is a smart fintech dashboard that combines multiple payment-related problem statements into one practical product. It helps users gain better control, visibility, and understanding of their digital payments.
+| Module | Endpoints |
+|--------|-----------|
+| **Auth** | `POST /api/auth/register`, `POST /api/auth/login` |
+| **Users** | `GET/PUT /api/users/profile`, `GET/PUT /api/users/settings`, `GET /api/users/gmail-status` |
+| **Subscriptions** | `GET/POST /api/subscriptions`, `PATCH /api/subscriptions/:id/pause`, `PATCH /api/subscriptions/:id/resume` |
+| **Suggestions** | `GET /api/subscriptions/suggestions`, `POST /api/subscriptions/suggestions/:id/approve` |
+| **Transactions** | `GET /api/transactions`, `PUT /api/transactions/:id` |
+| **Dashboard** | `GET /api/dashboard/stats`, `GET /api/dashboard/charts` |
+| **Rewards** | `GET/POST /api/rewards`, `GET /api/rewards/summary/sources` |
+| **Wallets** | `GET/POST /api/wallets`, `GET/PUT/DELETE /api/wallets/:id` |
+| **Gmail** | `GET /api/gmail/auth-url`, `GET /api/gmail/callback`, `POST /api/gmail/scan` |
+| **Plaid** | `POST /api/plaid/create-link-token`, `POST /api/plaid/exchange-public-token` |
+
+---
+
+## 📁 Project Structure
+
+```text
+PayPilot/
+├── backend/
+│   ├── src/
+│   │   ├── controllers/    # Business logic (10 controllers)
+│   │   ├── routes/         # API routes (12 route files)
+│   │   ├── models/         # Mongoose schemas (7 models)
+│   │   ├── middleware/     # Auth & validation
+│   │   └── services/       # Gmail, Plaid, Pattern Detector
+│   └── index.js            # Server entry point
+├── frontend/
+│   ├── src/
+│   │   ├── pages/         # 12 page components
+│   │   ├── components/    # Reusable UI components
+│   │   └── main.jsx       # Entry point
+│   └── vite.config.js
+└── README.md
+```
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- MongoDB Atlas account
+- Google Cloud Console project (for Gmail API)
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/anand880441-source/PayPilot.git
+cd PayPilot
+
+# Backend setup
+cd backend
+npm install
+# Create .env file (see variables below)
+npm run dev
+
+# Frontend setup
+cd ../frontend
+npm install
+npm run dev
+```
+
+### 🔧 Environment Variables
+
+**Backend (`.env`)**
+```env
+PORT=5000
+DATABASE_URL=mongodb+srv://...
+JWT_SECRET=your_secret_key
+GMAIL_CLIENT_ID=...
+GMAIL_CLIENT_SECRET=...
+```
+
+---
+
+## 🔮 Future Scope
+- [ ] **AI Spending Insights**: Predictive analytics for your financial health.
+- [ ] **PDF OCR Parsing**: Upload statements in PDF format for automatic extraction.
+- [ ] **Mobile Experience**: Native mobile app built with React Native.
+- [ ] **Multi-Currency Support**: Unified tracking for international accounts.
+
+---
+
+## 👨‍💻 Developer
+**Anand Suthar**  
+*Full Stack MERN Developer*
+
+[![GitHub](https://img.shields.io/badge/GitHub-anand880441--source-181717?style=for-the-badge&logo=github)](https://github.com/anand880441-source)
+
+---
+
+<p align="center"> <b>PayPilot — Smart Payment Control, Simplified.</b> 🚀 </p>
