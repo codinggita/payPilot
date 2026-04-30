@@ -2,21 +2,22 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Loader2, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { API_URL } from '../config';
 
 const WalletCard = ({ wallet, onRefresh, isGridView }) => {
     const [showMenu, setShowMenu] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
-    
+
     const handleDelete = async () => {
         if (!confirm(`Remove ${wallet.walletName} from your wallets?`)) return;
-        
+
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`/api/wallets/${wallet._id}`, {
+            const response = await fetch(`${API_URL}/wallets/${wallet._id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             if (response.ok) {
                 alert('Wallet removed successfully');
                 onRefresh();
@@ -26,13 +27,13 @@ const WalletCard = ({ wallet, onRefresh, isGridView }) => {
             alert('Failed to remove wallet');
         }
     };
-    
+
     const handleViewHistory = () => {
         setShowHistory(!showHistory);
     };
-    
+
     const isActive = wallet.status === 'active';
-    
+
     if (isGridView) {
         return (
             <div className={`glass-panel rounded-3xl overflow-hidden flex flex-col group transition-all duration-500 border border-white/5 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 ${!isActive ? 'opacity-60 grayscale' : ''}`}>
@@ -50,7 +51,7 @@ const WalletCard = ({ wallet, onRefresh, isGridView }) => {
                             </div>
                         </div>
                         <div className="relative">
-                            <button 
+                            <button
                                 onClick={() => setShowMenu(!showMenu)}
                                 className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-slate-600"
                             >
@@ -58,7 +59,7 @@ const WalletCard = ({ wallet, onRefresh, isGridView }) => {
                             </button>
                             {showMenu && (
                                 <div className="absolute right-0 mt-2 w-36 bg-[#1f2020] rounded-xl border border-white/10 shadow-xl z-10">
-                                    <button 
+                                    <button
                                         onClick={handleDelete}
                                         className="w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-white/5 rounded-xl transition-colors"
                                     >
@@ -86,9 +87,8 @@ const WalletCard = ({ wallet, onRefresh, isGridView }) => {
                         </div>
                         <div>
                             <span className="text-[10px] font-bold uppercase tracking-widest block mb-2 text-slate-500">Status</span>
-                            <div className={`inline-flex items-center px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${
-                                wallet.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/5 text-slate-500'
-                            }`}>
+                            <div className={`inline-flex items-center px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${wallet.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/5 text-slate-500'
+                                }`}>
                                 {wallet.status !== 'inactive' && <span className="w-1 h-1 rounded-full bg-emerald-500 mr-2"></span>}
                                 {wallet.status === 'active' ? 'Active' : wallet.status}
                             </div>
@@ -100,7 +100,7 @@ const WalletCard = ({ wallet, onRefresh, isGridView }) => {
                     <span className="text-[10px] font-bold text-slate-500">
                         Last active: {wallet.updatedAt ? new Date(wallet.updatedAt).toLocaleDateString() : 'Today'}
                     </span>
-                    <button 
+                    <button
                         onClick={handleViewHistory}
                         className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-all text-indigo-400 hover:text-indigo-300"
                     >
@@ -163,14 +163,14 @@ const WalletCard = ({ wallet, onRefresh, isGridView }) => {
                     </div>
                 </div>
                 <div className="flex gap-2 ml-4">
-                    <button 
+                    <button
                         onClick={handleViewHistory}
                         className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1"
                     >
                         <ExternalLink className="w-3 h-3" />
                         Details
                     </button>
-                    <button 
+                    <button
                         onClick={handleDelete}
                         className="text-xs text-red-400 hover:text-red-300 font-medium"
                     >
@@ -211,10 +211,10 @@ function Wallets() {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/wallets', {
+            const response = await fetch(`${API_URL}/wallets`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             if (response.ok) {
                 const result = await response.json();
                 setWallets(result.data || []);
@@ -235,7 +235,7 @@ function Wallets() {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/wallets', {
+            const response = await fetch(`${API_URL}/wallets`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -248,7 +248,7 @@ function Wallets() {
                     linkedCard: newWallet.linkedCard
                 })
             });
-            
+
             if (response.ok) {
                 alert('Wallet added successfully');
                 setShowAddModal(false);
@@ -286,7 +286,7 @@ function Wallets() {
                                     <span className="text-2xl font-bold text-white font-manrope tracking-tight">${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => setShowAddModal(true)}
                                 className="bg-indigo-600 text-white font-bold py-4 px-8 rounded-2xl flex items-center gap-3 hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 active:scale-[0.98]"
                             >
@@ -299,23 +299,21 @@ function Wallets() {
                     {/* Toolbar with Working Grid/List Toggle */}
                     <div className="flex items-center justify-between glass-panel px-6 py-3 rounded-2xl border border-white/5 bg-white/[0.01]">
                         <div className="flex items-center gap-4">
-                            <button 
+                            <button
                                 onClick={() => setViewMode('grid')}
-                                className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-3 transition-all ${
-                                    viewMode === 'grid' 
-                                        ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30' 
+                                className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-3 transition-all ${viewMode === 'grid'
+                                        ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
                                         : 'text-slate-500 hover:text-white'
-                                }`}
+                                    }`}
                             >
                                 <span className="material-symbols-outlined text-lg">grid_view</span> Grid
                             </button>
-                            <button 
+                            <button
                                 onClick={() => setViewMode('list')}
-                                className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-3 transition-all ${
-                                    viewMode === 'list' 
-                                        ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30' 
+                                className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-3 transition-all ${viewMode === 'list'
+                                        ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
                                         : 'text-slate-500 hover:text-white'
-                                }`}
+                                    }`}
                             >
                                 <span className="material-symbols-outlined text-lg">list</span> List
                             </button>
@@ -344,9 +342,9 @@ function Wallets() {
                             {wallets.map((wallet) => (
                                 <WalletCard key={wallet._id} wallet={wallet} onRefresh={fetchWallets} isGridView={true} />
                             ))}
-                            
+
                             {/* Add New Placeholder */}
-                            <button 
+                            <button
                                 onClick={() => setShowAddModal(true)}
                                 className="border-2 border-dashed border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center gap-6 group hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all duration-500"
                             >
@@ -364,7 +362,7 @@ function Wallets() {
                             {wallets.map((wallet) => (
                                 <WalletCard key={wallet._id} wallet={wallet} onRefresh={fetchWallets} isGridView={false} />
                             ))}
-                            <button 
+                            <button
                                 onClick={() => setShowAddModal(true)}
                                 className="w-full border-2 border-dashed border-white/10 rounded-2xl p-6 flex items-center justify-center gap-4 group hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all"
                             >
@@ -374,84 +372,84 @@ function Wallets() {
                         </div>
                     )}
 
-                    
-            {/* Compare View - Shows when toggled ON */}
-            {compareView && wallets.length >= 2 && (
-                <div className="glass-panel rounded-3xl border border-white/5 bg-white/[0.01] p-6">
-                    <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-indigo-400">compare</span>
-                        Wallet Comparison
-                    </h3>
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-white/5 border-b border-white/10">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase">Feature</th>
-                                    {wallets.slice(0, 4).map((w, i) => (
-                                        <th key={i} className="px-6 py-3 text-center text-xs font-bold text-white uppercase">{w.walletName}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/5">
-                                <tr>
-                                    <td className="px-6 py-4 text-sm text-slate-400">Balance</td>
-                                    {wallets.slice(0, 4).map((w, i) => (
-                                        <td key={i} className="px-6 py-4 text-center font-bold text-white">
-                                            ${w.balance?.toFixed(2)}
-                                        </td>
-                                    ))}
-                                </tr>
-                                <tr>
-                                    <td className="px-6 py-4 text-sm text-slate-400">Rewards</td>
-                                    {wallets.slice(0, 4).map((w, i) => (
-                                        <td key={i} className="px-6 py-4 text-center font-bold text-amber-400">
-                                            {w.rewardsBalance?.toLocaleString() || 0} pts
-                                        </td>
-                                    ))}
-                                </tr>
-                                <tr>
-                                    <td className="px-6 py-4 text-sm text-slate-400">Provider</td>
-                                    {wallets.slice(0, 4).map((w, i) => (
-                                        <td key={i} className="px-6 py-4 text-center text-slate-300">{w.provider}</td>
-                                    ))}
-                                </tr>
-                                <tr>
-                                    <td className="px-6 py-4 text-sm text-slate-400">Status</td>
-                                    {wallets.slice(0, 4).map((w, i) => (
-                                        <td key={i} className="px-6 py-4 text-center">
-                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${w.status === "active" ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-slate-500"}`}>
-                                                {w.status}
-                                            </span>
-                                        </td>
-                                    ))}
-                                </tr>
-                                <tr>
-                                    <td className="px-6 py-4 text-sm text-slate-400">Linked Card</td>
-                                    {wallets.slice(0, 4).map((w, i) => (
-                                        <td key={i} className="px-6 py-4 text-center text-slate-300">{w.linkedCard || "N/A"}</td>
-                                    ))}
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <p className="text-xs text-slate-500 text-center mt-4">
-                        Compare up to 4 wallets side by side. {wallets.length > 4 ? `(Showing first 4 of ${wallets.length} wallets)` : ""}
-                    </p>
-                </div>
-            )}
 
-            {compareView && wallets.length < 2 && (
-                <div className="glass-panel rounded-3xl border border-white/5 p-8 text-center">
-                    <span className="material-symbols-outlined text-4xl text-slate-500 opacity-30">compare</span>
-                    <p className="text-slate-400 mt-4">Add at least 2 wallets to use Compare View</p>
-                </div>
-            )}
+                    {/* Compare View - Shows when toggled ON */}
+                    {compareView && wallets.length >= 2 && (
+                        <div className="glass-panel rounded-3xl border border-white/5 bg-white/[0.01] p-6">
+                            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-indigo-400">compare</span>
+                                Wallet Comparison
+                            </h3>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-white/5 border-b border-white/10">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase">Feature</th>
+                                            {wallets.slice(0, 4).map((w, i) => (
+                                                <th key={i} className="px-6 py-3 text-center text-xs font-bold text-white uppercase">{w.walletName}</th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        <tr>
+                                            <td className="px-6 py-4 text-sm text-slate-400">Balance</td>
+                                            {wallets.slice(0, 4).map((w, i) => (
+                                                <td key={i} className="px-6 py-4 text-center font-bold text-white">
+                                                    ${w.balance?.toFixed(2)}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                        <tr>
+                                            <td className="px-6 py-4 text-sm text-slate-400">Rewards</td>
+                                            {wallets.slice(0, 4).map((w, i) => (
+                                                <td key={i} className="px-6 py-4 text-center font-bold text-amber-400">
+                                                    {w.rewardsBalance?.toLocaleString() || 0} pts
+                                                </td>
+                                            ))}
+                                        </tr>
+                                        <tr>
+                                            <td className="px-6 py-4 text-sm text-slate-400">Provider</td>
+                                            {wallets.slice(0, 4).map((w, i) => (
+                                                <td key={i} className="px-6 py-4 text-center text-slate-300">{w.provider}</td>
+                                            ))}
+                                        </tr>
+                                        <tr>
+                                            <td className="px-6 py-4 text-sm text-slate-400">Status</td>
+                                            {wallets.slice(0, 4).map((w, i) => (
+                                                <td key={i} className="px-6 py-4 text-center">
+                                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${w.status === "active" ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-slate-500"}`}>
+                                                        {w.status}
+                                                    </span>
+                                                </td>
+                                            ))}
+                                        </tr>
+                                        <tr>
+                                            <td className="px-6 py-4 text-sm text-slate-400">Linked Card</td>
+                                            {wallets.slice(0, 4).map((w, i) => (
+                                                <td key={i} className="px-6 py-4 text-center text-slate-300">{w.linkedCard || "N/A"}</td>
+                                            ))}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p className="text-xs text-slate-500 text-center mt-4">
+                                Compare up to 4 wallets side by side. {wallets.length > 4 ? `(Showing first 4 of ${wallets.length} wallets)` : ""}
+                            </p>
+                        </div>
+                    )}
+
+                    {compareView && wallets.length < 2 && (
+                        <div className="glass-panel rounded-3xl border border-white/5 p-8 text-center">
+                            <span className="material-symbols-outlined text-4xl text-slate-500 opacity-30">compare</span>
+                            <p className="text-slate-400 mt-4">Add at least 2 wallets to use Compare View</p>
+                        </div>
+                    )}
 
                     {/* Recent Activity */}
                     <div className="space-y-8">
                         <div className="flex items-center justify-between">
                             <h2 className="text-2xl font-bold text-white font-manrope tracking-tight">Recent Activity</h2>
-                            <button 
+                            <button
                                 onClick={handleViewAllActivity}
                                 className="text-indigo-400 font-bold text-sm uppercase tracking-widest hover:text-indigo-300 transition-colors border-b border-indigo-500/30 pb-1 flex items-center gap-1"
                             >
@@ -563,7 +561,7 @@ function Wallets() {
                                     value={newWallet.linkedCard}
                                     onChange={(e) => setNewWallet({ ...newWallet, linkedCard: e.target.value })}
                                     className="w-full bg-[#292a2a] rounded-lg px-4 py-2.5 border border-white/10 focus:border-indigo-500 outline-none text-white"
-                                    placeholder="•••• 1234"
+                                    placeholder="ï¿½ï¿½ï¿½ï¿½ 1234"
                                 />
                             </div>
                             <div className="flex gap-3 pt-4">

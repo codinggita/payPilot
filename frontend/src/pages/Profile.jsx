@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { User, Mail, Phone, Building2, Calendar, Shield, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { API_URL } from '../config';
 
 const Profile = () => {
     const [user, setUser] = useState(null);
@@ -21,10 +22,10 @@ const Profile = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/users/profile', {
+            const response = await fetch(`${API_URL}/users/profile`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             if (response.ok) {
                 const result = await response.json();
                 const userData = result.data || result;
@@ -56,10 +57,10 @@ const Profile = () => {
     const handleSave = async () => {
         setSaveLoading(true);
         setMessage(null);
-        
+
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/users/profile', {
+            const response = await fetch(`${API_URL}/users/profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -67,9 +68,9 @@ const Profile = () => {
                 },
                 body: JSON.stringify(formData)
             });
-            
+
             const result = await response.json();
-            
+
             if (response.ok) {
                 setUser(prev => ({ ...prev, ...formData }));
                 // Update localStorage user info
@@ -92,10 +93,10 @@ const Profile = () => {
     // Format date
     const formatDate = (date) => {
         if (!date) return 'N/A';
-        return new Date(date).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+        return new Date(date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
     };
 
@@ -177,7 +178,7 @@ const Profile = () => {
                                             )}
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex items-center gap-3 text-slate-300">
                                         <Mail className="w-5 h-5 text-indigo-400" />
                                         <div>
@@ -216,7 +217,7 @@ const Profile = () => {
                                             )}
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex items-center gap-3 text-slate-300">
                                         <Building2 className="w-5 h-5 text-indigo-400" />
                                         <div>

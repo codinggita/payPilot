@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Upload, FileText, CheckCircle, Clock, AlertCircle, Database, TrendingUp } from 'lucide-react';
+import { API_URL } from '../config';
 
 const Reconciliation = () => {
   const [stats, setStats] = useState({
@@ -19,10 +20,10 @@ const Reconciliation = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/reconciliation/stats', {
+      const response = await fetch(`${API_URL}/reconciliation/stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
+
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
@@ -43,19 +44,19 @@ const Reconciliation = () => {
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     setUploading(true);
     const formData = new FormData();
     formData.append('statement', file);
-    
+
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/reconciliation/upload', {
+      const response = await fetch(`${API_URL}/reconciliation/upload`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       });
-      
+
       if (response.ok) {
         const result = await response.json();
         alert(`Upload complete! Found ${result.detectedCount} potential subscriptions.`);
@@ -70,7 +71,7 @@ const Reconciliation = () => {
     }
   };
 
-  const matchRate = stats.totalTransactions > 0 
+  const matchRate = stats.totalTransactions > 0
     ? ((stats.matchedTransactions / stats.totalTransactions) * 100).toFixed(1)
     : 0;
 
@@ -127,7 +128,7 @@ const Reconciliation = () => {
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Upload Bank Statement</h3>
             <p className="text-slate-400 mb-6">Upload a CSV or PDF bank statement to detect subscriptions</p>
-            
+
             <label className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 transition-all cursor-pointer">
               {uploading ? 'Processing...' : 'Choose File'}
               <input type="file" accept=".csv,.pdf" onChange={handleFileUpload} className="hidden" disabled={uploading} />
@@ -144,7 +145,7 @@ const Reconciliation = () => {
                   <div key={idx} className="flex items-center justify-between">
                     <span className="text-sm text-slate-300">{cat._id || 'Uncategorized'}</span>
                     <div className="flex-1 mx-4 h-2 bg-white/5 rounded-full overflow-hidden">
-                      <div 
+                      <div
                         className="h-full bg-indigo-500 rounded-full"
                         style={{ width: `${(cat.total / stats.totalAmount) * 100}%` }}
                       />

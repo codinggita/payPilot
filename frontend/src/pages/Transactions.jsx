@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Download, Filter, Search, X } from 'lucide-react';
+import { API_URL } from '../config';
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -16,15 +17,15 @@ const Transactions = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      let url = '/api/transactions?limit=200';
+      let url = `${API_URL}/transactions?limit=200`;
       if (filters.status !== 'all') url += `&status=${filters.status}`;
       if (filters.category !== 'all') url += `&category=${filters.category}`;
       if (filters.search) url += `&search=${encodeURIComponent(filters.search)}`;
-      
+
       const response = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
+
       if (response.ok) {
         const result = await response.json();
         const data = result.data || [];
@@ -50,7 +51,7 @@ const Transactions = () => {
     // Create CSV content
     const headers = ['Date', 'Merchant', 'Category', 'Amount', 'Status'];
     const csvRows = [headers.join(',')];
-    
+
     transactions.forEach(tx => {
       const row = [
         new Date(tx.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -61,9 +62,9 @@ const Transactions = () => {
       ];
       csvRows.push(row.join(','));
     });
-    
+
     const csvContent = csvRows.join('\n');
-    
+
     // Create download link
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
@@ -77,7 +78,7 @@ const Transactions = () => {
   };
 
   const getStatusStyle = (status) => {
-    switch(status) {
+    switch (status) {
       case 'matched': return { dot: 'bg-emerald-500', text: 'text-emerald-400', label: 'Matched' };
       case 'pending': return { dot: 'bg-yellow-500 animate-pulse', text: 'text-yellow-400', label: 'Pending' };
       case 'disputed': return { dot: 'bg-red-500', text: 'text-red-400', label: 'Disputed' };
@@ -105,13 +106,13 @@ const Transactions = () => {
             <div>
               <h1 className="text-4xl font-bold font-manrope text-white tracking-tight">Transactions</h1>
               <p className="text-slate-400 mt-2">
-                {transactions.length > 0 
+                {transactions.length > 0
                   ? `Showing ${transactions.length} real transactions from your bank statements`
                   : 'Upload a bank statement to see your transactions'}
               </p>
             </div>
             {transactions.length > 0 && (
-              <button 
+              <button
                 onClick={handleExportCSV}
                 className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20"
               >
@@ -153,7 +154,7 @@ const Transactions = () => {
                 <option value="disputed">Disputed</option>
               </select>
             </div>
-            
+
             <div className="flex-1 flex items-center gap-2 px-4 py-2 bg-[#1f2020] rounded-xl border border-white/5">
               <Search className="w-4 h-4 text-slate-400" />
               <input
@@ -185,7 +186,7 @@ const Transactions = () => {
               <p className="text-sm text-slate-500 mt-2 max-w-md mx-auto">
                 Go to the Reconciliation page and upload a CSV bank statement to see your real transaction data here.
               </p>
-              <button 
+              <button
                 onClick={() => window.location.href = '/reconciliation'}
                 className="mt-6 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-500"
               >

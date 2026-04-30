@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Zap, Bell, User, ArrowRight, CreditCard, Receipt, Loader2 } from 'lucide-react';
+import { API_URL } from '../config';
 
 function TopNavBar() {
     const navigate = useNavigate();
@@ -35,11 +36,11 @@ function TopNavBar() {
     useEffect(() => {
         if (searchQuery.length >= 2) {
             if (debounceRef.current) clearTimeout(debounceRef.current);
-            
+
             debounceRef.current = setTimeout(async () => {
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await fetch(`/api/search/suggestions?query=${encodeURIComponent(searchQuery)}`, {
+                    const response = await fetch(`${API_URL}/search/suggestions?query=${encodeURIComponent(searchQuery)}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (response.ok) {
@@ -60,19 +61,19 @@ function TopNavBar() {
     // Handle search submission
     const handleSearch = async (e) => {
         e?.preventDefault();
-        
+
         if (!searchQuery.trim()) return;
-        
+
         setLoading(true);
         setShowDropdown(true);
         setShowSuggestions(false);
-        
+
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`, {
+            const response = await fetch(`${API_URL}/search?query=${encodeURIComponent(searchQuery)}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             if (response.ok) {
                 const result = await response.json();
                 setSearchResults({
@@ -98,7 +99,7 @@ function TopNavBar() {
     const handleResultClick = (type, item) => {
         setShowDropdown(false);
         setSearchQuery('');
-        
+
         if (type === 'transaction') {
             navigate('/transactions');
         } else if (type === 'subscription') {
@@ -125,9 +126,9 @@ function TopNavBar() {
                 <div className="relative w-full max-w-md">
                     <form onSubmit={handleSearch}>
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
-                        <input 
-                            type="text" 
-                            placeholder="Search transactions, subscriptions, merchants..." 
+                        <input
+                            type="text"
+                            placeholder="Search transactions, subscriptions, merchants..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
@@ -135,7 +136,7 @@ function TopNavBar() {
                             className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-12 pr-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
                         />
                         {searchQuery && (
-                            <button 
+                            <button
                                 type="button"
                                 onClick={() => { setSearchQuery(''); setShowDropdown(false); setShowSuggestions(false); }}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
@@ -144,7 +145,7 @@ function TopNavBar() {
                             </button>
                         )}
                     </form>
-                    
+
                     {/* Suggestions Dropdown */}
                     {showSuggestions && suggestions.length > 0 && (
                         <div className="absolute top-full mt-2 w-full bg-[#1f2020] rounded-xl border border-white/10 shadow-2xl overflow-hidden z-50">
@@ -168,28 +169,28 @@ function TopNavBar() {
                     )}
                 </div>
             </div>
-            
+
             {/* Right Actions */}
             <div className="flex items-center gap-6">
                 {/* Quick Action Button */}
-                <button 
+                <button
                     onClick={() => navigate('/subscriptions')}
                     className="hidden sm:flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 duration-200 shadow-lg shadow-indigo-600/20"
                 >
                     <span>Quick Action</span>
                     <Zap className="w-4 h-4" />
                 </button>
-                
+
                 {/* Notifications */}
                 <div className="relative" ref={dropdownRef}>
-                    <button 
+                    <button
                         onClick={handleNotificationClick}
                         className="relative text-slate-400 hover:text-white transition-colors p-1"
                     >
                         <Bell className="w-5 h-5" />
                         <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-indigo-500 rounded-full border-2 border-[#121414]"></span>
                     </button>
-                    
+
                     {/* Notifications Dropdown */}
                     {showNotifications && (
                         <div className="absolute right-0 mt-3 w-80 bg-[#1f2020] rounded-xl border border-white/10 shadow-2xl overflow-hidden z-50">
@@ -243,10 +244,10 @@ function TopNavBar() {
                         </div>
                     )}
                 </div>
-                
+
                 {/* User Profile */}
                 <div className="flex items-center gap-3">
-                    <button 
+                    <button
                         onClick={() => navigate('/profile')}
                         className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 shadow-lg cursor-pointer hover:border-indigo-500/50 transition-colors bg-indigo-600/20 flex items-center justify-center"
                     >
@@ -266,14 +267,14 @@ function TopNavBar() {
                         <span className="text-xs text-slate-400">
                             {searchResults.totalResults} results for "<span className="text-white font-medium">{searchQuery}</span>"
                         </span>
-                        <button 
+                        <button
                             onClick={() => setShowDropdown(false)}
                             className="text-slate-500 hover:text-white"
                         >
                             <X className="w-3 h-3" />
                         </button>
                     </div>
-                    
+
                     {/* Transaction Results */}
                     {searchResults.transactions?.length > 0 && (
                         <div>
@@ -291,7 +292,7 @@ function TopNavBar() {
                                         <div className="text-left">
                                             <p className="text-sm font-medium text-white">{tx.merchant}</p>
                                             <p className="text-[10px] text-slate-500">
-                                                {new Date(tx.date).toLocaleDateString()} • {tx.category}
+                                                {new Date(tx.date).toLocaleDateString()} ï¿½ {tx.category}
                                             </p>
                                         </div>
                                     </div>
@@ -300,7 +301,7 @@ function TopNavBar() {
                             ))}
                         </div>
                     )}
-                    
+
                     {/* Subscription Results */}
                     {searchResults.subscriptions?.length > 0 && (
                         <div>
@@ -318,7 +319,7 @@ function TopNavBar() {
                                         <div className="text-left">
                                             <p className="text-sm font-medium text-white">{sub.merchant}</p>
                                             <p className="text-[10px] text-slate-500">
-                                                {sub.billingCycle} • Next: {new Date(sub.nextRenewalDate).toLocaleDateString()}
+                                                {sub.billingCycle} ï¿½ Next: {new Date(sub.nextRenewalDate).toLocaleDateString()}
                                             </p>
                                         </div>
                                     </div>
@@ -327,7 +328,7 @@ function TopNavBar() {
                             ))}
                         </div>
                     )}
-                    
+
                     <div className="p-3 border-t border-white/5 text-center">
                         <button className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">
                             Press Enter for full results

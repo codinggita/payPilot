@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
+import { API_URL } from '../config';
 
 const RewardStatCard = ({ title, value, change, trend, icon, color }) => (
     <div className="glass-panel p-6 rounded-2xl border border-white/5 bg-white/[0.02]">
@@ -45,7 +46,7 @@ const RewardSourceCard = ({ name, type, amount, status, logo, color, isPoints, o
                 {status}
             </div>
             {status === 'Ready' && onRedeem && (
-                <button 
+                <button
                     onClick={() => onRedeem(rewardId)}
                     className="mt-2 text-[9px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
                 >
@@ -74,10 +75,10 @@ function Rewards() {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/rewards', {
+            const response = await fetch(`${API_URL}/rewards`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             if (response.ok) {
                 const result = await response.json();
                 setRewards(result.data || []);
@@ -95,23 +96,23 @@ function Rewards() {
         // Calculate rewards points per month from actual data
         const monthlyPoints = {};
         const now = new Date();
-        
+
         rewardsData.forEach(reward => {
             const date = new Date(reward.createdAt);
             const month = date.toLocaleString('default', { month: 'short' });
             if (!monthlyPoints[month]) monthlyPoints[month] = 0;
             monthlyPoints[month] += reward.pointsEarned || 0;
         });
-        
+
         // Default months if no data
         const months = ['MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG'];
         const maxPoints = Math.max(...Object.values(monthlyPoints), 100);
-        
+
         const newChartData = months.map(month => ({
             month,
             value: monthlyPoints[month] ? Math.min((monthlyPoints[month] / maxPoints) * 100, 100) : [50, 65, 75, 85, 90, 100][months.indexOf(month)]
         }));
-        
+
         setChartData(newChartData);
     };
 
@@ -147,7 +148,7 @@ function Rewards() {
     const handleRedeem = async (rewardId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`/api/rewards/${rewardId}`, {
+            const response = await fetch(`${API_URL}/rewards/${rewardId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -155,7 +156,7 @@ function Rewards() {
                 },
                 body: JSON.stringify({ status: 'redeemed', redemptionMethod: 'manual' })
             });
-            
+
             if (response.ok) {
                 alert('? Reward redeemed successfully!');
                 fetchRewards(); // Refresh the list
@@ -174,10 +175,10 @@ function Rewards() {
             alert('No rewards available for redemption');
             return;
         }
-        
+
         if (confirm(`Redeem ${readyRewards.length} reward(s) worth ${summary.totalPoints.toLocaleString()} points + $${summary.totalCashback.toFixed(2)}?`)) {
             for (const reward of readyRewards) {
-                await fetch(`/api/rewards/${reward._id}`, {
+                await fetch(`${API_URL}/rewards/${reward._id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -197,33 +198,33 @@ function Rewards() {
 
     // Calculate source-based rewards for the right sidebar
     const sourceRewards = [
-        { 
+        {
             id: rewards.find(r => r.sourceName === 'American Express Platinum')?._id,
-            name: 'American Express', 
-            type: 'Platinum Business', 
-            amount: Math.floor(summary.totalPoints * 0.36).toLocaleString(), 
-            status: summary.totalPoints > 0 ? 'Ready' : 'Pending', 
-            color: 'bg-[#006FCF]', 
-            isPoints: true 
+            name: 'American Express',
+            type: 'Platinum Business',
+            amount: Math.floor(summary.totalPoints * 0.36).toLocaleString(),
+            status: summary.totalPoints > 0 ? 'Ready' : 'Pending',
+            color: 'bg-[#006FCF]',
+            isPoints: true
         },
-        { 
+        {
             id: rewards.find(r => r.sourceName === 'Chase Sapphire Reserve')?._id,
-            name: 'Chase Ultimate', 
-            type: 'Sapphire Reserve', 
-            amount: Math.floor(summary.totalPoints * 0.1).toLocaleString(), 
-            status: summary.totalPoints > 0 ? 'Ready' : 'Pending', 
-            color: 'bg-[#117ACA]', 
-            isPoints: true 
+            name: 'Chase Ultimate',
+            type: 'Sapphire Reserve',
+            amount: Math.floor(summary.totalPoints * 0.1).toLocaleString(),
+            status: summary.totalPoints > 0 ? 'Ready' : 'Pending',
+            color: 'bg-[#117ACA]',
+            isPoints: true
         },
-        { 
+        {
             id: rewards.find(r => r.sourceName === 'PayPilot Cashback')?._id,
-            name: 'PayPilot Wallet', 
-            type: 'Platform Cashback', 
-            amount: `$${summary.totalCashback.toFixed(2)}`, 
-            status: summary.totalCashback > 0 ? 'Ready' : 'Pending', 
-            logo: 'wallet', 
-            color: 'bg-indigo-600', 
-            isPoints: false 
+            name: 'PayPilot Wallet',
+            type: 'Platform Cashback',
+            amount: `$${summary.totalCashback.toFixed(2)}`,
+            status: summary.totalCashback > 0 ? 'Ready' : 'Pending',
+            logo: 'wallet',
+            color: 'bg-indigo-600',
+            isPoints: false
         }
     ];
 
@@ -239,7 +240,7 @@ function Rewards() {
                             <h1 className="text-4xl font-bold font-manrope text-white tracking-tight">Rewards & Cashback</h1>
                             <p className="text-slate-400 mt-2 font-medium">Analyze your earnings and maximize your enterprise rewards strategy.</p>
                         </div>
-                        <button 
+                        <button
                             onClick={handleBulkRedeem}
                             className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-xl shadow-indigo-600/20 active:scale-[0.98] transition-all hover:from-indigo-500 hover:to-indigo-600"
                         >
@@ -249,27 +250,27 @@ function Rewards() {
 
                     {/* Summary Bento Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                        <RewardStatCard 
-                            title="Total Points" 
-                            value={summary.totalPoints.toLocaleString()} 
-                            change="12.5%" 
-                            trend="up" 
-                            icon="token" 
-                            color="indigo" 
+                        <RewardStatCard
+                            title="Total Points"
+                            value={summary.totalPoints.toLocaleString()}
+                            change="12.5%"
+                            trend="up"
+                            icon="token"
+                            color="indigo"
                         />
-                        <RewardStatCard 
-                            title="Cashback Earned" 
-                            value={`$${summary.totalCashback.toFixed(2)}`} 
-                            change="8.2%" 
-                            trend="up" 
-                            icon="payments" 
-                            color="emerald" 
+                        <RewardStatCard
+                            title="Cashback Earned"
+                            value={`$${summary.totalCashback.toFixed(2)}`}
+                            change="8.2%"
+                            trend="up"
+                            icon="payments"
+                            color="emerald"
                         />
-                        <RewardStatCard 
-                            title="Pending Approval" 
-                            value={`$${summary.pendingAmount.toFixed(2)}`} 
-                            icon="hourglass_empty" 
-                            color="amber" 
+                        <RewardStatCard
+                            title="Pending Approval"
+                            value={`$${summary.pendingAmount.toFixed(2)}`}
+                            icon="hourglass_empty"
+                            color="amber"
                         />
                     </div>
 
@@ -279,38 +280,36 @@ function Rewards() {
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
                                 <h3 className="text-xl font-bold text-white font-manrope">Rewards Performance</h3>
                                 <div className="flex bg-white/5 p-1 rounded-xl">
-                                    <button 
+                                    <button
                                         onClick={() => handleChartPeriodChange('6months')}
-                                        className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                                            chartPeriod === '6months' 
-                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' 
+                                        className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${chartPeriod === '6months'
+                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10'
                                                 : 'text-slate-500 hover:text-white'
-                                        }`}
+                                            }`}
                                     >
                                         6 Months
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={() => handleChartPeriodChange('1year')}
-                                        className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                                            chartPeriod === '1year' 
-                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' 
+                                        className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${chartPeriod === '1year'
+                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10'
                                                 : 'text-slate-500 hover:text-white'
-                                        }`}
+                                            }`}
                                     >
                                         1 Year
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <div className="h-64 flex items-end justify-between gap-4 px-4">
                                 {chartData.map((item, i) => (
                                     <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
-                                        <div 
-                                            className="w-full bg-indigo-500/10 rounded-t-xl group-hover:bg-indigo-500/20 transition-all relative overflow-hidden" 
+                                        <div
+                                            className="w-full bg-indigo-500/10 rounded-t-xl group-hover:bg-indigo-500/20 transition-all relative overflow-hidden"
                                             style={{ height: `${item.value}%` }}
                                         >
-                                            <div 
-                                                className="absolute inset-x-0 bottom-0 bg-indigo-500 rounded-t-xl shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all" 
+                                            <div
+                                                className="absolute inset-x-0 bottom-0 bg-indigo-500 rounded-t-xl shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all"
                                                 style={{ height: `${item.value}%` }}
                                             ></div>
                                         </div>
@@ -323,9 +322,9 @@ function Rewards() {
                         {/* Reward Sources */}
                         <div className="col-span-12 lg:col-span-4 space-y-4">
                             {sourceRewards.map((reward, idx) => (
-                                <RewardSourceCard 
-                                    key={idx} 
-                                    {...reward} 
+                                <RewardSourceCard
+                                    key={idx}
+                                    {...reward}
                                     onRedeem={() => reward.id && handleRedeem(reward.id)}
                                     rewardId={reward.id}
                                 />
@@ -376,22 +375,19 @@ function Rewards() {
                                                     {reward.rewardType === 'points' ? `${reward.pointsEarned?.toLocaleString()} pts` : `$${reward.cashbackAmount?.toFixed(2)}`}
                                                 </td>
                                                 <td className="px-8 py-5">
-                                                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl ${
-                                                        reward.status === 'credited' ? 'bg-emerald-500/10 border border-emerald-500/20' : 
-                                                        reward.status === 'pending' ? 'bg-amber-500/10 border border-amber-500/20' : 
-                                                        reward.status === 'redeemed' ? 'bg-slate-500/10 border border-slate-500/20' :
-                                                        'bg-slate-500/10 border border-slate-500/20'
-                                                    }`}>
-                                                        <div className={`w-1.5 h-1.5 rounded-full ${
-                                                            reward.status === 'credited' ? 'bg-emerald-400' : 
-                                                            reward.status === 'pending' ? 'bg-amber-400' : 
-                                                            reward.status === 'redeemed' ? 'bg-slate-400' : 'bg-slate-400'
-                                                        }`}></div>
-                                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${
-                                                            reward.status === 'credited' ? 'text-emerald-400' : 
-                                                            reward.status === 'pending' ? 'text-amber-400' : 
-                                                            reward.status === 'redeemed' ? 'text-slate-400' : 'text-slate-400'
+                                                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl ${reward.status === 'credited' ? 'bg-emerald-500/10 border border-emerald-500/20' :
+                                                            reward.status === 'pending' ? 'bg-amber-500/10 border border-amber-500/20' :
+                                                                reward.status === 'redeemed' ? 'bg-slate-500/10 border border-slate-500/20' :
+                                                                    'bg-slate-500/10 border border-slate-500/20'
                                                         }`}>
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${reward.status === 'credited' ? 'bg-emerald-400' :
+                                                                reward.status === 'pending' ? 'bg-amber-400' :
+                                                                    reward.status === 'redeemed' ? 'bg-slate-400' : 'bg-slate-400'
+                                                            }`}></div>
+                                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${reward.status === 'credited' ? 'text-emerald-400' :
+                                                                reward.status === 'pending' ? 'text-amber-400' :
+                                                                    reward.status === 'redeemed' ? 'text-slate-400' : 'text-slate-400'
+                                                            }`}>
                                                             {reward.status === 'credited' ? 'Available' : reward.status === 'pending' ? 'Processing' : reward.status === 'redeemed' ? 'Redeemed' : reward.status}
                                                         </span>
                                                     </div>

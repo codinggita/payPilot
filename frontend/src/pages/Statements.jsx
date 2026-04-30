@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Loader2, Upload, FileText, Download, Filter, ChevronLeft, ChevronRight, TrendingUp, AlertCircle, CheckCircle, Database } from 'lucide-react';
+import { API_URL } from '../config';
 
 const StatementRow = ({ statement }) => {
     const status = statement.totalAmount > 0 ? 'Parsed' : 'Pending';
     const type = statement.type || 'csv';
-    
+
     return (
         <tr className="hover:bg-white/[0.03] transition-all cursor-pointer group">
             <td className="px-6 py-5">
@@ -20,9 +21,8 @@ const StatementRow = ({ statement }) => {
             <td className="px-6 py-5 text-slate-400 text-sm font-medium tabular-nums">{statement.date}</td>
             <td className="px-6 py-5 text-slate-400 text-sm font-medium">{statement.account}</td>
             <td className="px-6 py-5">
-                <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${
-                    status === 'Parsed' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
-                }`}>
+                <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${status === 'Parsed' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
+                    }`}>
                     <span className={`w-1 h-1 rounded-full ${status === 'Parsed' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`}></span>
                     {status}
                 </span>
@@ -61,27 +61,27 @@ function Statements() {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            
+
             // Fetch history
-            const historyRes = await fetch('/api/statements/history', {
+            const historyRes = await fetch(`${API_URL}/statements/history`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (historyRes.ok) {
                 const result = await historyRes.json();
                 setHistory(result.data || []);
             }
-            
+
             // Fetch stats
-            const statsRes = await fetch('/api/statements/stats', {
+            const statsRes = await fetch(`${API_URL}/statements/stats`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (statsRes.ok) {
                 const result = await statsRes.json();
                 setStats(result.data || {});
             }
-            
+
             // Fetch preview
-            const previewRes = await fetch('/api/statements/preview', {
+            const previewRes = await fetch(`${API_URL}/statements/preview`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (previewRes.ok) {
@@ -104,17 +104,17 @@ function Statements() {
         return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     };
 
-    
+
     const handleExportParsedData = () => {
         if (history.length === 0) {
             alert('No parsed data to export. Upload a statement first.');
             return;
         }
-        
+
         // Create CSV with all statement data
         const csvHeaders = ['Upload Date', 'File Name', 'Entries', 'Total Amount', 'Status'];
         const csvRows = [csvHeaders.join(',')];
-        
+
         history.forEach(item => {
             const row = [
                 item.date,
@@ -125,7 +125,7 @@ function Statements() {
             ];
             csvRows.push(row.join(','));
         });
-        
+
         const csvContent = csvRows.join('\n');
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = window.URL.createObjectURL(blob);
@@ -143,21 +143,21 @@ function Statements() {
             alert('No data available. Upload a statement first to generate a report.');
             return;
         }
-        
+
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/transactions?limit=500', {
+            const response = await fetch(`${API_URL}/transactions?limit=500`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             if (response.ok) {
                 const result = await response.json();
                 const transactions = result.data || [];
-                
+
                 // Create detailed CSV report
                 const csvHeaders = ['Date', 'Merchant', 'Category', 'Amount', 'Status', 'Source'];
                 const csvRows = [csvHeaders.join(',')];
-                
+
                 transactions.forEach(tx => {
                     const row = [
                         new Date(tx.date).toLocaleDateString(),
@@ -169,7 +169,7 @@ function Statements() {
                     ];
                     csvRows.push(row.join(','));
                 });
-                
+
                 // Add summary section
                 csvRows.push('');
                 csvRows.push('SUMMARY');
@@ -177,7 +177,7 @@ function Statements() {
                 csvRows.push(`Total Amount,${transactions.reduce((s, t) => s + (t.amount || 0), 0).toFixed(2)}`);
                 csvRows.push(`Matched,${transactions.filter(t => t.status === 'matched').length}`);
                 csvRows.push(`Pending,${transactions.filter(t => t.status === 'pending').length}`);
-                
+
                 const csvContent = csvRows.join('\n');
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const url = window.URL.createObjectURL(blob);
@@ -188,7 +188,7 @@ function Statements() {
                 link.click();
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
-                
+
                 alert('Full parse report downloaded successfully!');
             }
         } catch (error) {
@@ -218,7 +218,7 @@ function Statements() {
                                 <Download className="w-4 h-4" />
                                 Export Parsed Data
                             </button>
-                            <button 
+                            <button
                                 onClick={() => window.location.href = '/reconciliation'}
                                 className="flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-xl shadow-indigo-600/20 font-bold text-sm active:scale-[0.98]"
                             >
@@ -236,7 +236,7 @@ function Statements() {
                                 <h3 className="text-xl font-bold text-white font-manrope">Upload History</h3>
                                 <div className="flex items-center gap-3">
                                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Filter:</span>
-                                    <select 
+                                    <select
                                         value={filterStatus}
                                         onChange={(e) => setFilterStatus(e.target.value)}
                                         className="bg-transparent border-none text-xs font-bold text-indigo-400 focus:ring-0 cursor-pointer outline-none"
@@ -261,7 +261,7 @@ function Statements() {
                                         <p className="text-sm text-slate-500 mt-2">
                                             Go to Reconciliation page to upload your first bank statement
                                         </p>
-                                        <button 
+                                        <button
                                             onClick={() => window.location.href = '/reconciliation'}
                                             className="mt-4 px-6 py-2.5 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-500"
                                         >
@@ -395,9 +395,8 @@ function Statements() {
                                 </div>
                                 <div className="flex items-end justify-between mt-4">
                                     <h4 className="text-3xl font-bold text-white tabular-nums font-manrope">{stat.value}</h4>
-                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                                        stat.color === 'emerald' ? 'text-emerald-400' : stat.color === 'amber' ? 'text-amber-400' : 'text-slate-500'
-                                    }`}>
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${stat.color === 'emerald' ? 'text-emerald-400' : stat.color === 'amber' ? 'text-amber-400' : 'text-slate-500'
+                                        }`}>
                                         {stat.sub}
                                     </span>
                                 </div>
