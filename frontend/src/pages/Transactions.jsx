@@ -21,24 +21,14 @@ const Transactions = () => {
       if (filters.category !== 'all') url += `&category=${filters.category}`;
       if (filters.search) url += `&search=${encodeURIComponent(filters.search)}`;
       
-      console.log('Fetching transactions from:', url);
-      
       const response = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      console.log('Response status:', response.status);
-      
       if (response.ok) {
         const result = await response.json();
-        console.log('API Response:', result);
-        
-        // Handle different response formats
-        const data = result.data || result || [];
+        const data = result.data || [];
         setTransactions(data);
-        console.log(`Loaded ${data.length} real transactions from database`);
-      } else {
-        console.error('Failed to fetch:', await response.text());
       }
     } catch (error) {
       console.error('Fetch transactions error:', error);
@@ -50,6 +40,41 @@ const Transactions = () => {
   useEffect(() => {
     fetchTransactions();
   }, [filters]);
+
+  const handleExportCSV = () => {
+    if (transactions.length === 0) {
+      alert('No transactions to export');
+      return;
+    }
+
+    // Create CSV content
+    const headers = ['Date', 'Merchant', 'Category', 'Amount', 'Status'];
+    const csvRows = [headers.join(',')];
+    
+    transactions.forEach(tx => {
+      const row = [
+        new Date(tx.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        `"${tx.merchant.replace(/"/g, '""')}"`,
+        tx.category || 'Uncategorized',
+        tx.amount?.toFixed(2) || '0.00',
+        tx.status || 'pending'
+      ];
+      csvRows.push(row.join(','));
+    });
+    
+    const csvContent = csvRows.join('\n');
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `transactions_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
 
   const getStatusStyle = (status) => {
     switch(status) {
@@ -86,7 +111,10 @@ const Transactions = () => {
               </p>
             </div>
             {transactions.length > 0 && (
-              <button className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all">
+              <button 
+                onClick={handleExportCSV}
+                className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20"
+              >
                 <Download className="w-4 h-4" />
                 Export CSV
               </button>
@@ -151,7 +179,7 @@ const Transactions = () => {
           ) : transactions.length === 0 ? (
             <div className="text-center py-12 bg-[#1f2020] rounded-2xl border border-white/5">
               <div className="w-16 h-16 mx-auto mb-4 bg-slate-500/10 rounded-full flex items-center justify-center">
-                <FileText className="w-8 h-8 text-slate-500" />
+                <span className="material-symbols-outlined text-3xl text-slate-500">receipt_long</span>
               </div>
               <p className="text-slate-400 font-medium">No transactions yet</p>
               <p className="text-sm text-slate-500 mt-2 max-w-md mx-auto">
