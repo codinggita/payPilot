@@ -17,6 +17,9 @@ const reconciliationRoutes = require('./routes/reconciliation.routes');
 const gmailRoutes = require('./routes/gmail.routes');
 const plaidRoutes = require('./routes/plaid.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const settingsRoutes = require('./routes/settings.routes');
+const statementRoutes = require('./routes/statement.routes');
+const searchRoutes = require('./routes/search.routes');
 
 const app = express();
 
@@ -103,6 +106,9 @@ app.use('/api/reconciliation', reconciliationRoutes);
 app.use('/api/gmail', gmailRoutes);
 app.use('/api/plaid', plaidRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/users/settings', settingsRoutes);
+app.use('/api/statements', statementRoutes);
+app.use('/api/search', searchRoutes);
 
 // Health check
 app.get('/', (req, res) => {
@@ -125,3 +131,7 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
+
+
+
+
