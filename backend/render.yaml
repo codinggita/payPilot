@@ -1,0 +1,20 @@
+# render.yaml
+services:
+  - type: web
+    name: paypilot-api
+    env: node
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://paypilot.vercel.app
+      - key: BACKEND_URL
+        value: https://paypilot-api.onrender.com
