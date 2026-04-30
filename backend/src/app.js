@@ -16,6 +16,7 @@ const walletRoutes = require('./routes/wallet.routes');
 const reconciliationRoutes = require('./routes/reconciliation.routes');
 const gmailRoutes = require('./routes/gmail.routes');
 const plaidRoutes = require('./routes/plaid.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
 
 const app = express();
 
@@ -38,9 +39,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
-        const allowedTypes = ['text/csv', 'application/pdf', '.csv', '.pdf'];
         const ext = path.extname(file.originalname).toLowerCase();
         if (ext === '.csv' || ext === '.pdf') {
             cb(null, true);
@@ -50,7 +50,6 @@ const upload = multer({
     }
 });
 
-// Make upload available to routes
 app.locals.upload = upload;
 
 // CORS Configuration
@@ -80,7 +79,7 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Body parsing middleware (json only, not for file uploads)
+// Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -103,6 +102,7 @@ app.use('/api/wallets', walletRoutes);
 app.use('/api/reconciliation', reconciliationRoutes);
 app.use('/api/gmail', gmailRoutes);
 app.use('/api/plaid', plaidRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
 app.get('/', (req, res) => {
