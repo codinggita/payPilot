@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import SignUp from './pages/SignUp';
 import Login from './pages/Login';
@@ -18,18 +19,21 @@ function App() {
     <Router>
       <div className="bg-background min-h-screen">
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/subscriptions" element={<Subscriptions />} />
-          <Route path="/rewards" element={<Rewards />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/reconciliation" element={<Reconciliation />} />
-          <Route path="/wallets" element={<Wallets />} />
-          <Route path="/statements" element={<Statements />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Settings />} />
+          
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/subscriptions" element={<ProtectedRoute><Subscriptions /></ProtectedRoute>} />
+          <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
+          <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
+          <Route path="/reconciliation" element={<ProtectedRoute><Reconciliation /></ProtectedRoute>} />
+          <Route path="/wallets" element={<ProtectedRoute><Wallets /></ProtectedRoute>} />
+          <Route path="/statements" element={<ProtectedRoute><Statements /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>

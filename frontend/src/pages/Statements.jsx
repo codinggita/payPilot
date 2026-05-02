@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Loader2, Upload, FileText, Download, Filter, ChevronLeft, ChevronRight, TrendingUp, AlertCircle, CheckCircle, Database } from 'lucide-react';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const StatementRow = ({ statement }) => {
     const status = statement.totalAmount > 0 ? 'Parsed' : 'Pending';
@@ -107,7 +108,7 @@ function Statements() {
 
     const handleExportParsedData = () => {
         if (history.length === 0) {
-            alert('No parsed data to export. Upload a statement first.');
+            showToast.success('No parsed data to export. Upload a statement first.');
             return;
         }
 
@@ -140,7 +141,7 @@ function Statements() {
 
     const handleFullParseReport = async () => {
         if (preview.totalEntries === 0) {
-            alert('No data available. Upload a statement first to generate a report.');
+            showToast.success('No data available. Upload a statement first to generate a report.');
             return;
         }
 
@@ -189,11 +190,11 @@ function Statements() {
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
 
-                alert('Full parse report downloaded successfully!');
+                showToast.success('Full parse report downloaded successfully!');
             }
         } catch (error) {
             console.error('Parse report error:', error);
-            alert('Failed to generate report');
+            showToast.error('Failed to generate report');
         }
     };
 

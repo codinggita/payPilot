@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Wallet, Gift, PiggyBank, AlertCircle, Calendar, Loader2, TrendingUp } from 'lucide-react';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Banknote, CheckCircle, AlertCircle, Loader2, Shield, ExternalLink } from 'lucide-react';
 import { usePlaidLink } from 'react-plaid-link';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const ConnectPlaid = ({ onConnected }) => {
   const [loading, setLoading] = useState(false);
@@ -59,7 +60,7 @@ const ConnectPlaid = ({ onConnected }) => {
       setLinkToken(data.link_token);
     } catch (error) {
       console.error('Create link token error:', error);
-      alert('Failed to initialize bank connection. Please try again.');
+      showToast.error('Failed to initialize bank connection. Please try again.');
       setLoading(false);
     }
   };
@@ -83,13 +84,13 @@ const ConnectPlaid = ({ onConnected }) => {
       if (data.success) {
         setConnected(true);
         if (onConnected) onConnected();
-        alert(`Bank connected successfully! Detected ${data.detectedCount} subscriptions from your transactions.`);
+        showToast.success(`Bank connected successfully! Detected ${data.detectedCount} subscriptions from your transactions.`);
       } else {
         throw new Error(data.error || 'Failed to connect bank');
       }
     } catch (error) {
       console.error('Exchange token error:', error);
-      alert('Failed to connect bank account. Please try again.');
+      showToast.error('Failed to connect bank account. Please try again.');
     } finally {
       setLoading(false);
       setLinkToken(null);

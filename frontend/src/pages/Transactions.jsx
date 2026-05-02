@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Download, Filter, Search, X } from 'lucide-react';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -44,7 +45,7 @@ const Transactions = () => {
 
   const handleExportCSV = () => {
     if (transactions.length === 0) {
-      alert('No transactions to export');
+      showToast.error('No transactions to export');
       return;
     }
 
