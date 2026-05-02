@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
-import { Wallet, Gift, PiggyBank, AlertCircle, Calendar, Loader2, TrendingUp } from 'lucide-react';
+import SEO from '../components/SEO';
+import PageSkeleton from '../components/Skeletons/PageSkeleton';
+import { Wallet, Gift, PiggyBank, AlertCircle, Calendar, TrendingUp } from 'lucide-react';
 import { API_URL } from '../config';
-import { showToast } from '../utils/toast';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -42,8 +43,11 @@ const Dashboard = () => {
     return (
       <div className="bg-[#121414] min-h-screen flex">
         <Sidebar />
-        <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+        <div className="flex-1 flex flex-col min-w-0 md:pl-64">
+          <TopNavBar />
+          <main className="p-6 md:p-10 max-w-[1600px] mx-auto w-full">
+            <PageSkeleton />
+          </main>
         </div>
       </div>
     );
@@ -51,16 +55,16 @@ const Dashboard = () => {
 
   return (
     <div className="bg-[#121414] text-[#e3e2e2] min-h-screen flex">
+      <SEO title="Dashboard" description="View your financial overview including total spend, active subscriptions, rewards earned, and monthly savings." />
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 md:pl-64">
         <TopNavBar />
         <main className="p-6 md:p-10 max-w-[1600px] mx-auto w-full">
           <div className="mb-8">
             <h1 className="text-4xl font-bold font-manrope text-white tracking-tight">Dashboard</h1>
-            <p className="text-slate-400 mt-2">Welcome back! Here's your financial overview.</p>
+            <p className="text-slate-400 mt-2">Welcome back! Here is your financial overview.</p>
           </div>
 
-          {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="bg-[#1f2020] rounded-xl p-5 border border-white/5">
               <div className="flex justify-between items-start mb-3">
@@ -77,9 +81,6 @@ const Dashboard = () => {
               </div>
               <p className="text-sm text-slate-400">Active Subscriptions</p>
               <p className="text-2xl font-bold text-white">{stats?.activeSubscriptions || 0}</p>
-              {stats?.upcomingRenewals > 0 && (
-                <p className="text-xs text-yellow-400 mt-1">{stats.upcomingRenewals} renewing soon</p>
-              )}
             </div>
 
             <div className="bg-[#1f2020] rounded-xl p-5 border border-white/5">
@@ -99,9 +100,8 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Alerts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {stats?.pendingReconciliation > 0 && (
+          {stats?.pendingReconciliation > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-red-950/20 border border-red-500/20 rounded-xl p-4 flex items-center gap-4">
                 <AlertCircle className="w-6 h-6 text-red-400" />
                 <div>
@@ -109,21 +109,10 @@ const Dashboard = () => {
                   <p className="text-sm text-slate-400">{stats.pendingReconciliation} transactions need reconciliation</p>
                 </div>
               </div>
-            )}
-            {stats?.upcomingRenewals > 0 && (
-              <div className="bg-indigo-950/20 border border-indigo-500/20 rounded-xl p-4 flex items-center gap-4">
-                <Calendar className="w-6 h-6 text-indigo-400" />
-                <div>
-                  <p className="font-semibold text-white">Upcoming Renewals</p>
-                  <p className="text-sm text-slate-400">{stats.upcomingRenewals} subscriptions renew in next 7 days</p>
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Spending Trend */}
             <div className="bg-[#1f2020] rounded-xl p-6 border border-white/5">
               <h3 className="text-lg font-bold text-white mb-4">Spending Trend</h3>
               {charts?.spendingTrend?.length > 0 ? (
@@ -146,7 +135,6 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Category Breakdown */}
             <div className="bg-[#1f2020] rounded-xl p-6 border border-white/5">
               <h3 className="text-lg font-bold text-white mb-4">Spending by Category</h3>
               {charts?.categoryBreakdown?.length > 0 ? (
