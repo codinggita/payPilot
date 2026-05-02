@@ -4,44 +4,20 @@ import TopNavBar from '../components/TopNavBar';
 import { Download, Filter, Search, X } from 'lucide-react';
 import { API_URL } from '../config';
 import { showToast } from '../utils/toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTransactions, setFilters } from '../store/slices/transactionSlice';
 
 const Transactions = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    status: 'all',
-    category: 'all',
-    search: ''
-  });
+  const dispatch = useDispatch();
+  const { list: transactions, loading, filters } = useSelector((state) => state.transactions);
 
-  const fetchTransactions = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      let url = `${API_URL}/transactions?limit=200`;
-      if (filters.status !== 'all') url += `&status=${filters.status}`;
-      if (filters.category !== 'all') url += `&category=${filters.category}`;
-      if (filters.search) url += `&search=${encodeURIComponent(filters.search)}`;
-
-      const response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        const data = result.data || [];
-        setTransactions(data);
-      }
-    } catch (error) {
-      console.error('Fetch transactions error:', error);
-    } finally {
-      setLoading(false);
-    }
+  const loadTransactions = () => {
+    dispatch(fetchTransactions(filters));
   };
 
   useEffect(() => {
-    fetchTransactions();
-  }, [filters]);
+    loadTransactions();
+  }, [filters, dispatch]);
 
   const handleExportCSV = () => {
     if (transactions.length === 0) {
@@ -146,7 +122,7 @@ const Transactions = () => {
               <Filter className="w-4 h-4 text-slate-400" />
               <select
                 value={filters.status}
-                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                onChange={(e) => dispatch(setFilters({ status: e.target.value }))}
                 className="bg-transparent text-white text-sm focus:outline-none"
               >
                 <option value="all">All Status</option>
@@ -162,11 +138,11 @@ const Transactions = () => {
                 type="text"
                 placeholder="Search by merchant..."
                 value={filters.search}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                onChange={(e) => dispatch(setFilters({ search: e.target.value }))}
                 className="flex-1 bg-transparent text-white text-sm focus:outline-none placeholder:text-slate-500"
               />
               {filters.search && (
-                <button onClick={() => setFilters({ ...filters, search: '' })}>
+                <button onClick={() => dispatch(setFilters({ search: '' }))}>
                   <X className="w-4 h-4 text-slate-400 hover:text-white" />
                 </button>
               )}

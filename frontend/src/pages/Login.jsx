@@ -3,9 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, Shield, Zap, Activity } from 'lucide-react';
 import { API_URL } from '../config';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../store/slices/authSlice';
 
 function Login() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -41,13 +44,12 @@ function Login() {
             }
 
             if (data.token) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                console.log('Login successful, token saved');
+                dispatch(loginSuccess({ token: data.token, user: data.user }));
                 navigate('/dashboard');
             } else {
-                throw new Error('No token received');
+                console.error('No token received from server');
             }
+
         } catch (err) {
             console.error('Login error:', err);
             setError(err.message || 'Connection failed. Make sure backend is running on port 5000');
@@ -128,7 +130,7 @@ function Login() {
                                     <input
                                         className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
                                         id="password"
-                                        placeholder="••••••••"
+                                        placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
                                         type="password"
                                         value={formData.password}
                                         onChange={handleChange}

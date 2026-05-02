@@ -3,9 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, Shield, Zap, RefreshCw, Rocket, Sparkles, Hexagon } from 'lucide-react';
 import { API_URL } from '../config';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../store/slices/authSlice';
+
 
 function SignUp() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -22,7 +26,7 @@ function SignUp() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (formData.password !== formData.confirmPassword) {
             return setError('Passwords do not match');
         }
@@ -50,11 +54,11 @@ function SignUp() {
             }
 
             if (data.token) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
+                dispatch(loginSuccess({ token: data.token, user: data.user }));
             }
-            
+
             navigate('/dashboard');
+
         } catch (err) {
             setError(err.message);
         } finally {
@@ -130,11 +134,11 @@ function SignUp() {
                                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="fullName">Full Name</label>
                                 <div className="relative group">
                                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors" />
-                                    <input 
-                                        className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all" 
-                                        id="fullName" 
-                                        placeholder="John Doe" 
-                                        type="text" 
+                                    <input
+                                        className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
+                                        id="fullName"
+                                        placeholder="John Doe"
+                                        type="text"
                                         value={formData.fullName}
                                         onChange={handleChange}
                                         required
@@ -146,11 +150,11 @@ function SignUp() {
                                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="email">Email Address</label>
                                 <div className="relative group">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors" />
-                                    <input 
-                                        className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all" 
-                                        id="email" 
-                                        placeholder="name@company.com" 
-                                        type="email" 
+                                    <input
+                                        className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
+                                        id="email"
+                                        placeholder="name@company.com"
+                                        type="email"
                                         value={formData.email}
                                         onChange={handleChange}
                                         required
@@ -163,11 +167,11 @@ function SignUp() {
                                     <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="password">Password</label>
                                     <div className="relative group">
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors" />
-                                        <input 
-                                            className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all" 
-                                            id="password" 
-                                            placeholder="••••••••" 
-                                            type="password" 
+                                        <input
+                                            className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
+                                            id="password"
+                                            placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+                                            type="password"
                                             value={formData.password}
                                             onChange={handleChange}
                                             required
@@ -178,11 +182,11 @@ function SignUp() {
                                     <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] block ml-1" htmlFor="confirmPassword">Confirm Password</label>
                                     <div className="relative group">
                                         <RefreshCw className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-white transition-colors" />
-                                        <input 
-                                            className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all" 
-                                            id="confirmPassword" 
-                                            placeholder="••••••••" 
-                                            type="password" 
+                                        <input
+                                            className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
+                                            id="confirmPassword"
+                                            placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+                                            type="password"
                                             value={formData.confirmPassword}
                                             onChange={handleChange}
                                             required
@@ -192,9 +196,9 @@ function SignUp() {
                             </div>
 
                             <div className="flex items-center gap-3 py-2">
-                                <input 
-                                    type="checkbox" 
-                                    id="terms" 
+                                <input
+                                    type="checkbox"
+                                    id="terms"
                                     className="w-5 h-5 rounded-md bg-white/5 border border-white/10 appearance-none checked:bg-indigo-600 checked:border-transparent transition-all cursor-pointer"
                                     required
                                 />
@@ -203,7 +207,7 @@ function SignUp() {
                                 </label>
                             </div>
 
-                            <button 
+                            <button
                                 disabled={loading}
                                 className="w-full bg-[#4f46e5] hover:bg-[#4338ca] disabled:opacity-50 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] mt-4"
                             >

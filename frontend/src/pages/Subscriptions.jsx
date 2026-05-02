@@ -7,12 +7,14 @@ import ConnectPlaid from '../components/ConnectPlaid';
 import ManualUpload from '../components/ManualUpload';
 import DetectedSubscriptions from '../components/DetectedSubscriptions';
 import CancellationModal from '../components/CancellationModal';
-import { API_URL } from '../config';
 import { showToast } from '../utils/toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchSubscriptions, pauseSubscription, resumeSubscription, deleteSubscription } from '../store/slices/subscriptionSlice';
+
 
 const Subscriptions = () => {
-  const [subscriptions, setSubscriptions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { list: subscriptions, loading } = useSelector((state) => state.subscriptions);
   const [showManualForm, setShowManualForm] = useState(false);
   const [refreshSuggestions, setRefreshSuggestions] = useState(0);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -24,76 +26,37 @@ const Subscriptions = () => {
     nextRenewalDate: ''
   });
 
-  const fetchSubscriptions = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/subscriptions`, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data) {
-          setSubscriptions(result.data);
-        } else if (Array.isArray(result)) {
-          setSubscriptions(result);
-        } else {
-          setSubscriptions([]);
-        }
-      }
-    } catch (error) {
-      console.error('Fetch subscriptions error:', error);
-    } finally {
-      setLoading(false);
-    }
+  const loadSubscriptions = () => {
+    dispatch(fetchSubscriptions());
   };
 
   useEffect(() => {
-    fetchSubscriptions();
+    loadSubscriptions();
 
     const handleSubscriptionsChange = () => {
-      fetchSubscriptions();
+      loadSubscriptions();
     };
     window.addEventListener('subscriptionsChanged', handleSubscriptionsChange);
 
     return () => {
       window.removeEventListener('subscriptionsChanged', handleSubscriptionsChange);
     };
-  }, []);
+  }, [dispatch]);
 
   const handlePause = async (id) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/subscriptions/${id}/pause`, {
-        method: 'PATCH',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-      });
-
-      if (response.ok) {
-        fetchSubscriptions();
-        showToast.success('Subscription paused. You will not receive renewal reminders.');
-      }
+      await dispatch(pauseSubscription(id)).unwrap();
+      showToast.success('Subscription paused');
     } catch (error) {
-      console.error('Pause error:', error);
       showToast.error('Failed to pause subscription');
     }
   };
 
   const handleResume = async (id) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/subscriptions/${id}/resume`, {
-        method: 'PATCH',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-      });
-
-      if (response.ok) {
-        fetchSubscriptions();
-        showToast.success('Subscription resumed. Renewal reminders are now active.');
-      }
+      await dispatch(resumeSubscription(id)).unwrap();
+      showToast.success('Subscription resumed');
     } catch (error) {
-      console.error('Resume error:', error);
       showToast.error('Failed to resume subscription');
     }
   };
@@ -106,18 +69,9 @@ const Subscriptions = () => {
   const handleCancelConfirm = async () => {
     if (selectedSubscription) {
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/subscriptions/${selectedSubscription._id}`, {
-          method: 'DELETE',
-          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-        });
-
-        if (response.ok) {
-          fetchSubscriptions();
-          showToast.success('Subscription removed from PayPilot');
-        }
+        await dispatch(deleteSubscription(selectedSubscription._id)).unwrap();
+        showToast.success('Subscription removed');
       } catch (error) {
-        console.error('Delete error:', error);
         showToast.error('Failed to remove subscription');
       }
     }
@@ -155,7 +109,7 @@ const Subscriptions = () => {
       if (response.ok) {
         setShowManualForm(false);
         setNewSubscription({ merchant: '', amount: '', billingCycle: 'monthly', nextRenewalDate: '' });
-        fetchSubscriptions();
+        loadSubscriptions();
         showToast.success('Subscription added successfully!');
       } else {
         showToast.error(data.message || 'Failed to add subscription');

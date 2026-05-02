@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
+    "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.8.4",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -25,6 +26,7 @@
     "react-hot-toast": "^2.5.2",
     "react-papaparse": "^4.4.0",
     "react-plaid-link": "^4.1.1",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^6.28.0",
     "recharts": "^2.15.1",
     "tailwind-merge": "^3.5.0"
