@@ -3,6 +3,7 @@ import { Upload, FileText, CheckCircle, Loader2, AlertCircle, Building2, CreditC
 import { API_URL } from '../config';
 import { showToast } from '../utils/toast';
 
+
 const ManualUpload = ({ onUploadComplete }) => {
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
