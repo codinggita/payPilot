@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Sparkles, Check, X, Loader2, Clock, DollarSign, Calendar, Mail, Landmark, FileText, Search } from 'lucide-react';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const DetectedSubscriptions = ({ refreshTrigger }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -49,12 +50,12 @@ const DetectedSubscriptions = ({ refreshTrigger }) => {
 
       if (response.ok) {
         setSuggestions(prev => prev.filter(s => s._id !== suggestionId));
-        alert('Subscription added successfully!');
+        showToast.success('Subscription added successfully!');
         window.dispatchEvent(new Event('subscriptionsChanged'));
       }
     } catch (error) {
       console.error('Approve error:', error);
-      alert('Failed to add subscription');
+      showToast.error('Failed to add subscription');
     } finally {
       setProcessing(null);
     }

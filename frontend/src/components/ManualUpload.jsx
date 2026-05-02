@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, FileText, CheckCircle, Loader2, AlertCircle, Building2, CreditCard, Landmark } from 'lucide-react';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const ManualUpload = ({ onUploadComplete }) => {
   const [uploading, setUploading] = useState(false);
@@ -50,11 +51,11 @@ const ManualUpload = ({ onUploadComplete }) => {
 
       if (onUploadComplete && data.detectedSubscriptions && data.detectedSubscriptions.length > 0) {
         onUploadComplete(data.detectedSubscriptions);
-        alert(`? Found ${data.detectedSubscriptions.length} new subscriptions!`);
+        showToast.success(`? Found ${data.detectedSubscriptions.length} new subscriptions!`);
       } else if (data.detectedCount > 0) {
-        alert(`? Processed! Found ${data.detectedCount} potential subscriptions.`);
+        showToast.success(`? Processed! Found ${data.detectedCount} potential subscriptions.`);
       } else {
-        alert('File processed. No recurring subscriptions detected.');
+        showToast.success('File processed. No recurring subscriptions detected.');
       }
 
       setTimeout(() => setUploaded(false), 3000);
@@ -97,8 +98,8 @@ const ManualUpload = ({ onUploadComplete }) => {
       </div>
 
       <label className={`block w-full border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${uploaded ? 'border-green-500 bg-green-500/10' :
-          error ? 'border-red-500 bg-red-500/10' :
-            'border-outline-variant hover:border-primary/50 hover:bg-primary/5'
+        error ? 'border-red-500 bg-red-500/10' :
+          'border-outline-variant hover:border-primary/50 hover:bg-primary/5'
         }`}>
         <input
           type="file"

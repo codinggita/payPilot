@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Upload, FileText, CheckCircle, Clock, AlertCircle, Database, TrendingUp } from 'lucide-react';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const Reconciliation = () => {
   const [stats, setStats] = useState({
@@ -59,12 +60,12 @@ const Reconciliation = () => {
 
       if (response.ok) {
         const result = await response.json();
-        alert(`Upload complete! Found ${result.detectedCount} potential subscriptions.`);
+        showToast.success(`Upload complete! Found ${result.detectedCount} potential subscriptions.`);
         fetchStats();
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Upload failed');
+      showToast.error('Upload failed');
     } finally {
       setUploading(false);
       e.target.value = '';

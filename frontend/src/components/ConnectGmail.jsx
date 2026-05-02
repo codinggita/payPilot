@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mail, CheckCircle, AlertCircle, Loader2, Trash2, ExternalLink } from 'lucide-react';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const ConnectGmail = ({ onConnected }) => {
   const [loading, setLoading] = useState(false);
@@ -54,7 +55,7 @@ const ConnectGmail = ({ onConnected }) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('Please login first');
+        showToast.error('Please login first');
         window.location.href = '/login';
         return;
       }
@@ -69,7 +70,7 @@ const ConnectGmail = ({ onConnected }) => {
       window.location.href = authUrl;
     } catch (error) {
       console.error('Gmail connect error:', error);
-      alert('Failed to connect Gmail: ' + error.message);
+      showToast.error('Failed to connect Gmail: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -92,13 +93,13 @@ const ConnectGmail = ({ onConnected }) => {
         setConnected(false);
         setGmailEmail('');
         if (onConnected) onConnected();
-        alert('Gmail disconnected successfully');
+        showToast.success('Gmail disconnected successfully');
       } else {
         throw new Error('Failed to disconnect');
       }
     } catch (error) {
       console.error('Disconnect error:', error);
-      alert('Failed to disconnect Gmail');
+      showToast.error('Failed to disconnect Gmail');
     } finally {
       setLoading(false);
     }

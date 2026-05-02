@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Loader2, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const WalletCard = ({ wallet, onRefresh, isGridView }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -19,12 +20,12 @@ const WalletCard = ({ wallet, onRefresh, isGridView }) => {
             });
 
             if (response.ok) {
-                alert('Wallet removed successfully');
+                showToast.success('Wallet removed successfully');
                 onRefresh();
             }
         } catch (error) {
             console.error('Delete error:', error);
-            alert('Failed to remove wallet');
+            showToast.error('Failed to remove wallet');
         }
     };
 
@@ -250,14 +251,14 @@ function Wallets() {
             });
 
             if (response.ok) {
-                alert('Wallet added successfully');
+                showToast.success('Wallet added successfully');
                 setShowAddModal(false);
                 setNewWallet({ walletName: '', provider: '', balance: '', linkedCard: '' });
                 fetchWallets();
             }
         } catch (error) {
             console.error('Add wallet error:', error);
-            alert('Failed to add wallet');
+            showToast.error('Failed to add wallet');
         }
     };
 
@@ -302,8 +303,8 @@ function Wallets() {
                             <button
                                 onClick={() => setViewMode('grid')}
                                 className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-3 transition-all ${viewMode === 'grid'
-                                        ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
-                                        : 'text-slate-500 hover:text-white'
+                                    ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
+                                    : 'text-slate-500 hover:text-white'
                                     }`}
                             >
                                 <span className="material-symbols-outlined text-lg">grid_view</span> Grid
@@ -311,8 +312,8 @@ function Wallets() {
                             <button
                                 onClick={() => setViewMode('list')}
                                 className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-3 transition-all ${viewMode === 'list'
-                                        ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
-                                        : 'text-slate-500 hover:text-white'
+                                    ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
+                                    : 'text-slate-500 hover:text-white'
                                     }`}
                             >
                                 <span className="material-symbols-outlined text-lg">list</span> List

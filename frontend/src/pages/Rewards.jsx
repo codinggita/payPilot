@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const RewardStatCard = ({ title, value, change, trend, icon, color }) => (
     <div className="glass-panel p-6 rounded-2xl border border-white/5 bg-white/[0.02]">
@@ -158,21 +159,21 @@ function Rewards() {
             });
 
             if (response.ok) {
-                alert('? Reward redeemed successfully!');
+                showToast.success('? Reward redeemed successfully!');
                 fetchRewards(); // Refresh the list
             } else {
-                alert('Failed to redeem reward');
+                showToast.error('Failed to redeem reward');
             }
         } catch (error) {
             console.error('Redeem error:', error);
-            alert('Failed to redeem reward');
+            showToast.error('Failed to redeem reward');
         }
     };
 
     const handleBulkRedeem = async () => {
         const readyRewards = rewards.filter(r => r.status === 'credited' && (r.pointsEarned > 0 || r.cashbackAmount > 0));
         if (readyRewards.length === 0) {
-            alert('No rewards available for redemption');
+            showToast.success('No rewards available for redemption');
             return;
         }
 
@@ -187,7 +188,7 @@ function Rewards() {
                     body: JSON.stringify({ status: 'redeemed', redemptionMethod: 'bulk' })
                 });
             }
-            alert('? All rewards redeemed successfully!');
+            showToast.success('? All rewards redeemed successfully!');
             fetchRewards();
         }
     };
@@ -283,8 +284,8 @@ function Rewards() {
                                     <button
                                         onClick={() => handleChartPeriodChange('6months')}
                                         className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${chartPeriod === '6months'
-                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10'
-                                                : 'text-slate-500 hover:text-white'
+                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10'
+                                            : 'text-slate-500 hover:text-white'
                                             }`}
                                     >
                                         6 Months
@@ -292,8 +293,8 @@ function Rewards() {
                                     <button
                                         onClick={() => handleChartPeriodChange('1year')}
                                         className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${chartPeriod === '1year'
-                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10'
-                                                : 'text-slate-500 hover:text-white'
+                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10'
+                                            : 'text-slate-500 hover:text-white'
                                             }`}
                                     >
                                         1 Year
@@ -376,17 +377,17 @@ function Rewards() {
                                                 </td>
                                                 <td className="px-8 py-5">
                                                     <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl ${reward.status === 'credited' ? 'bg-emerald-500/10 border border-emerald-500/20' :
-                                                            reward.status === 'pending' ? 'bg-amber-500/10 border border-amber-500/20' :
-                                                                reward.status === 'redeemed' ? 'bg-slate-500/10 border border-slate-500/20' :
-                                                                    'bg-slate-500/10 border border-slate-500/20'
+                                                        reward.status === 'pending' ? 'bg-amber-500/10 border border-amber-500/20' :
+                                                            reward.status === 'redeemed' ? 'bg-slate-500/10 border border-slate-500/20' :
+                                                                'bg-slate-500/10 border border-slate-500/20'
                                                         }`}>
                                                         <div className={`w-1.5 h-1.5 rounded-full ${reward.status === 'credited' ? 'bg-emerald-400' :
-                                                                reward.status === 'pending' ? 'bg-amber-400' :
-                                                                    reward.status === 'redeemed' ? 'bg-slate-400' : 'bg-slate-400'
+                                                            reward.status === 'pending' ? 'bg-amber-400' :
+                                                                reward.status === 'redeemed' ? 'bg-slate-400' : 'bg-slate-400'
                                                             }`}></div>
                                                         <span className={`text-[10px] font-bold uppercase tracking-widest ${reward.status === 'credited' ? 'text-emerald-400' :
-                                                                reward.status === 'pending' ? 'text-amber-400' :
-                                                                    reward.status === 'redeemed' ? 'text-slate-400' : 'text-slate-400'
+                                                            reward.status === 'pending' ? 'text-amber-400' :
+                                                                reward.status === 'redeemed' ? 'text-slate-400' : 'text-slate-400'
                                                             }`}>
                                                             {reward.status === 'credited' ? 'Available' : reward.status === 'pending' ? 'Processing' : reward.status === 'redeemed' ? 'Redeemed' : reward.status}
                                                         </span>

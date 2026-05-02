@@ -8,6 +8,7 @@ import ManualUpload from '../components/ManualUpload';
 import DetectedSubscriptions from '../components/DetectedSubscriptions';
 import CancellationModal from '../components/CancellationModal';
 import { API_URL } from '../config';
+import { showToast } from '../utils/toast';
 
 const Subscriptions = () => {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -71,11 +72,11 @@ const Subscriptions = () => {
 
       if (response.ok) {
         fetchSubscriptions();
-        alert('Subscription paused. You will not receive renewal reminders.');
+        showToast.success('Subscription paused. You will not receive renewal reminders.');
       }
     } catch (error) {
       console.error('Pause error:', error);
-      alert('Failed to pause subscription');
+      showToast.error('Failed to pause subscription');
     }
   };
 
@@ -89,11 +90,11 @@ const Subscriptions = () => {
 
       if (response.ok) {
         fetchSubscriptions();
-        alert('Subscription resumed. Renewal reminders are now active.');
+        showToast.success('Subscription resumed. Renewal reminders are now active.');
       }
     } catch (error) {
       console.error('Resume error:', error);
-      alert('Failed to resume subscription');
+      showToast.error('Failed to resume subscription');
     }
   };
 
@@ -113,11 +114,11 @@ const Subscriptions = () => {
 
         if (response.ok) {
           fetchSubscriptions();
-          alert('Subscription removed from PayPilot');
+          showToast.success('Subscription removed from PayPilot');
         }
       } catch (error) {
         console.error('Delete error:', error);
-        alert('Failed to remove subscription');
+        showToast.error('Failed to remove subscription');
       }
     }
     setShowCancelModal(false);
@@ -129,7 +130,7 @@ const Subscriptions = () => {
 
     // Validate inputs
     if (!newSubscription.merchant || !newSubscription.amount || !newSubscription.nextRenewalDate) {
-      alert('Please fill in all fields');
+      showToast.error('Please fill in all fields');
       return;
     }
 
@@ -155,13 +156,13 @@ const Subscriptions = () => {
         setShowManualForm(false);
         setNewSubscription({ merchant: '', amount: '', billingCycle: 'monthly', nextRenewalDate: '' });
         fetchSubscriptions();
-        alert('Subscription added successfully!');
+        showToast.success('Subscription added successfully!');
       } else {
-        alert(data.message || 'Failed to add subscription');
+        showToast.error(data.message || 'Failed to add subscription');
       }
     } catch (error) {
       console.error('Add manual error:', error);
-      alert('Failed to add subscription');
+      showToast.error('Failed to add subscription');
     }
   };
 
