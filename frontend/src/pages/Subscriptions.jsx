@@ -10,7 +10,9 @@ import CancellationModal from '../components/CancellationModal';
 import { showToast } from '../utils/toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSubscriptions, pauseSubscription, resumeSubscription, deleteSubscription } from '../store/slices/subscriptionSlice';
-
+import { useFormik } from 'formik';
+import { subscriptionSchema } from '../utils/validationSchemas';
+import { API_URL } from '../config';
 
 const Subscriptions = () => {
   const dispatch = useDispatch();
@@ -19,11 +21,44 @@ const Subscriptions = () => {
   const [refreshSuggestions, setRefreshSuggestions] = useState(0);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState(null);
-  const [newSubscription, setNewSubscription] = useState({
-    merchant: '',
-    amount: '',
-    billingCycle: 'monthly',
-    nextRenewalDate: ''
+
+  const formik = useFormik({
+    initialValues: {
+      merchant: '',
+      amount: '',
+      billingCycle: 'monthly',
+      nextRenewalDate: ''
+    },
+    validationSchema: subscriptionSchema,
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/subscriptions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            merchant: values.merchant,
+            amount: parseFloat(values.amount),
+            billingCycle: values.billingCycle,
+            nextRenewalDate: values.nextRenewalDate
+          })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setShowManualForm(false);
+          resetForm();
+          loadSubscriptions();
+          showToast.success('Subscription added successfully!');
+        } else {
+          showToast.error(data.message || 'Failed to add subscription');
+        }
+      } catch (error) {
+        showToast.error('Failed to add subscription');
+      }
+    },
   });
 
   const loadSubscriptions = () => {
@@ -79,46 +114,6 @@ const Subscriptions = () => {
     setSelectedSubscription(null);
   };
 
-  const handleAddManual = async (e) => {
-    e.preventDefault();
-
-    // Validate inputs
-    if (!newSubscription.merchant || !newSubscription.amount || !newSubscription.nextRenewalDate) {
-      showToast.error('Please fill in all fields');
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/subscriptions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          merchant: newSubscription.merchant,
-          amount: parseFloat(newSubscription.amount),
-          billingCycle: newSubscription.billingCycle,
-          nextRenewalDate: newSubscription.nextRenewalDate
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setShowManualForm(false);
-        setNewSubscription({ merchant: '', amount: '', billingCycle: 'monthly', nextRenewalDate: '' });
-        loadSubscriptions();
-        showToast.success('Subscription added successfully!');
-      } else {
-        showToast.error(data.message || 'Failed to add subscription');
-      }
-    } catch (error) {
-      console.error('Add manual error:', error);
-      showToast.error('Failed to add subscription');
-    }
-  };
 
   const handleUploadComplete = (detected) => {
     if (detected?.length) {
@@ -163,12 +158,13 @@ const Subscriptions = () => {
           {showManualForm && (
             <div className="bg-[#1f2020] rounded-2xl p-6 mb-8 border border-white/10 shadow-xl">
               <h3 className="font-bold mb-4 text-white text-lg">Add Subscription Manually</h3>
-              <form onSubmit={handleAddManual} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <form onSubmit={formik.handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <input
                   type="text"
                   placeholder="Merchant (e.g., Netflix)"
-                  value={newSubscription.merchant}
-                  onChange={(e) => setNewSubscription({ ...newSubscription, merchant: e.target.value })}
+                  value={formik.values.merchant}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   className="bg-[#292a2a] rounded-lg px-4 py-2.5 border border-white/10 focus:border-indigo-500 outline-none text-white"
                   required
                 />
@@ -176,14 +172,18 @@ const Subscriptions = () => {
                   type="number"
                   placeholder="Amount"
                   step="0.01"
-                  value={newSubscription.amount}
-                  onChange={(e) => setNewSubscription({ ...newSubscription, amount: e.target.value })}
+                  value={formik.values.amount}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   className="bg-[#292a2a] rounded-lg px-4 py-2.5 border border-white/10 focus:border-indigo-500 outline-none text-white"
                   required
                 />
                 <select
-                  value={newSubscription.billingCycle}
-                  onChange={(e) => setNewSubscription({ ...newSubscription, billingCycle: e.target.value })}
+                  id="billingCycle"
+                  name="billingCycle"
+                  value={formik.values.billingCycle}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   className="bg-[#292a2a] rounded-lg px-4 py-2.5 border border-white/10 focus:border-indigo-500 outline-none text-white"
                 >
                   <option value="monthly">Monthly</option>
@@ -192,8 +192,9 @@ const Subscriptions = () => {
                 </select>
                 <input
                   type="date"
-                  value={newSubscription.nextRenewalDate}
-                  onChange={(e) => setNewSubscription({ ...newSubscription, nextRenewalDate: e.target.value })}
+                  value={formik.values.nextRenewalDate}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   className="bg-[#292a2a] rounded-lg px-4 py-2.5 border border-white/10 focus:border-indigo-500 outline-none text-white"
                   required
                 />

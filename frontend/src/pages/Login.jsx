@@ -5,58 +5,41 @@ import { Mail, Lock, ArrowRight, Shield, Zap, Activity } from 'lucide-react';
 import { API_URL } from '../config';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../store/slices/authSlice';
+import { useFormik } from 'formik';
+import { loginSchema } from '../utils/validationSchemas';
 
 function Login() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
-        setError('');
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-
-        try {
-            const response = await fetch(`${API_URL}/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify(formData),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Login failed');
+    const formik = useFormik({
+        initialValues: { email: '', password: '' },
+        validationSchema: loginSchema,
+        onSubmit: async (values) => {
+            setLoading(true);
+            setError('');
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(values),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Login failed');
+                if (data.token) {
+                    dispatch(loginSuccess({ token: data.token, user: data.user }));
+                    navigate('/dashboard');
+                }
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
             }
-
-            if (data.token) {
-                dispatch(loginSuccess({ token: data.token, user: data.user }));
-                navigate('/dashboard');
-            } else {
-                console.error('No token received from server');
-            }
-
-        } catch (err) {
-            console.error('Login error:', err);
-            setError(err.message || 'Connection failed. Make sure backend is running on port 5000');
-        } finally {
-            setLoading(false);
-        }
-    };
+        },
+    });
 
     return (
         <div className="bg-[#050505] text-white font-inter min-h-screen flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
@@ -98,7 +81,7 @@ function Login() {
                             </p>
                         </header>
 
-                        <form className="space-y-6" onSubmit={handleSubmit}>
+                        <form className="space-y-6" onSubmit={formik.handleSubmit}>
                             {error && (
                                 <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
                                     {error}
@@ -114,8 +97,9 @@ function Login() {
                                         id="email"
                                         placeholder="name@company.com"
                                         type="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
+                                        value={formik.values.email}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
                                         required
                                     />
                                 </div>
@@ -130,10 +114,11 @@ function Login() {
                                     <input
                                         className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
                                         id="password"
-                                        placeholder="��������"
+                                        placeholder=""
                                         type="password"
-                                        value={formData.password}
-                                        onChange={handleChange}
+                                        value={formik.values.password}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
                                         required
                                     />
                                 </div>
