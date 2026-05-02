@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Zap, Bell, User, ArrowRight, CreditCard, Receipt, Loader2 } from 'lucide-react';
 import { API_URL } from '../config';
+import { useDebounce } from '../hooks/useDebounce';
 
 function TopNavBar() {
     const navigate = useNavigate();
@@ -15,9 +16,7 @@ function TopNavBar() {
     const [showNotifications, setShowNotifications] = useState(false);
     const searchRef = useRef(null);
     const dropdownRef = useRef(null);
-    const debounceRef = useRef(null);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -32,15 +31,14 @@ function TopNavBar() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Fetch suggestions as user types
-    useEffect(() => {
-        if (searchQuery.length >= 2) {
-            if (debounceRef.current) clearTimeout(debounceRef.current);
+    const debouncedSearch = useDebounce(searchQuery, 300);
 
-            debounceRef.current = setTimeout(async () => {
+    useEffect(() => {
+        if (debouncedSearch.length >= 2) {
+            const fetchSuggestions = async () => {
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await fetch(`${API_URL}/search/suggestions?query=${encodeURIComponent(searchQuery)}`, {
+                    const response = await fetch(`${API_URL}/search/suggestions?query=${encodeURIComponent(debouncedSearch)}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (response.ok) {
@@ -51,12 +49,13 @@ function TopNavBar() {
                 } catch (error) {
                     console.error('Suggestions error:', error);
                 }
-            }, 300);
+            };
+            fetchSuggestions();
         } else {
             setSuggestions([]);
             setShowSuggestions(false);
         }
-    }, [searchQuery]);
+    }, [debouncedSearch]);
 
     // Handle search submission
     const handleSearch = async (e) => {
