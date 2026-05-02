@@ -1,27 +1,29 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  CreditCard, 
-  Award, 
-  Receipt, 
-  RefreshCw, 
-  Wallet, 
-  FileText, 
-  User, 
-  Settings, 
-  LogOut 
+import {
+  LayoutDashboard,
+  CreditCard,
+  Award,
+  Receipt,
+  RefreshCw,
+  Wallet,
+  FileText,
+  User,
+  Settings,
+  LogOut
 } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { logout } from '../store/slices/authSlice';
 
 const SidebarItem = ({ icon: Icon, label, path, active }) => {
+
   return (
     <Link
       to={path}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group ${
-        active 
-          ? 'bg-indigo-600/20 text-white border-r-2 border-indigo-500' 
-          : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
-      }`}
+      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group ${active
+        ? 'bg-indigo-600/20 text-white border-r-2 border-indigo-500'
+        : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
+        }`}
     >
       <Icon className="w-5 h-5" />
       <span className="font-medium tracking-tight">{label}</span>
@@ -32,10 +34,10 @@ const SidebarItem = ({ icon: Icon, label, path, active }) => {
 function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    dispatch(logout());
     navigate('/login');
   };
 
@@ -68,7 +70,7 @@ function Sidebar() {
         <SidebarItem icon={User} label="Profile" path="/profile" active={location.pathname === "/profile"} />
         <SidebarItem icon={Settings} label="Settings" path="/settings" active={location.pathname === "/settings"} />
         <div className="pt-4 mt-4 border-t border-white/5">
-          <button 
+          <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-red-400 transition-all group rounded-lg"
           >

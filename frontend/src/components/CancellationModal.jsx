@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, ExternalLink, AlertCircle, CheckCircle } from 'lucide-react';
 
+
 const cancellationGuides = {
     'netflix': {
         name: 'Netflix',
@@ -132,19 +133,19 @@ const cancellationGuides = {
 
 const getGuide = (merchant) => {
     const merchantLower = merchant.toLowerCase();
-    
+
     // Try exact match
     if (cancellationGuides[merchantLower]) {
         return cancellationGuides[merchantLower];
     }
-    
+
     // Try partial match
     for (const [key, guide] of Object.entries(cancellationGuides)) {
         if (merchantLower.includes(key) || key.includes(merchantLower)) {
             return guide;
         }
     }
-    
+
     // Default guide for unknown providers
     return {
         name: merchant,
@@ -168,7 +169,7 @@ const getGuide = (merchant) => {
 
 const CancellationModal = ({ subscription, onClose, onConfirm }) => {
     const guide = getGuide(subscription.merchant);
-    
+
     const handleCancel = () => {
         if (guide.url) {
             window.open(guide.url, '_blank');
@@ -176,7 +177,7 @@ const CancellationModal = ({ subscription, onClose, onConfirm }) => {
         if (onConfirm) onConfirm();
         onClose();
     };
-    
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <div className="bg-[#1f2020] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/10 shadow-2xl">
@@ -196,7 +197,7 @@ const CancellationModal = ({ subscription, onClose, onConfirm }) => {
                         <X className="w-5 h-5 text-slate-400" />
                     </button>
                 </div>
-                
+
                 {/* Content */}
                 <div className="p-6 space-y-6">
                     {/* Important Note */}
@@ -205,13 +206,13 @@ const CancellationModal = ({ subscription, onClose, onConfirm }) => {
                         <div>
                             <p className="text-sm text-yellow-400 font-medium">Important Note</p>
                             <p className="text-sm text-slate-300 mt-1">
-                                PayPilot cannot cancel subscriptions automatically. You need to follow these steps 
-                                on the provider's website. This is because Netflix, Spotify, and similar services 
+                                PayPilot cannot cancel subscriptions automatically. You need to follow these steps
+                                on the provider's website. This is because Netflix, Spotify, and similar services
                                 do not provide any public API for third-party cancellation.
                             </p>
                         </div>
                     </div>
-                    
+
                     {/* Steps */}
                     <div>
                         <h3 className="text-lg font-semibold text-white mb-4">Step-by-Step Instructions</h3>
@@ -226,7 +227,7 @@ const CancellationModal = ({ subscription, onClose, onConfirm }) => {
                             ))}
                         </div>
                     </div>
-                    
+
                     {/* Tips */}
                     {guide.tips && (
                         <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-4">
@@ -237,14 +238,14 @@ const CancellationModal = ({ subscription, onClose, onConfirm }) => {
                             <ul className="space-y-1">
                                 {guide.tips.map((tip, index) => (
                                     <li key={index} className="text-xs text-slate-400 flex items-start gap-2">
-                                        <span className="text-green-400">•</span>
+                                        <span className="text-green-400">ï¿½</span>
                                         {tip}
                                     </li>
                                 ))}
                             </ul>
                         </div>
                     )}
-                    
+
                     {/* Action Buttons */}
                     <div className="flex gap-3 pt-4 border-t border-white/10">
                         {guide.url && (

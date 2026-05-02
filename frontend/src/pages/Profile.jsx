@@ -3,8 +3,11 @@ import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { User, Mail, Phone, Building2, Calendar, Shield, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { API_URL } from '../config';
+import { useDispatch } from 'react-redux';
+import { updateProfile } from '../store/slices/authSlice';
 
 const Profile = () => {
+    const dispatch = useDispatch();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(false);
@@ -72,10 +75,7 @@ const Profile = () => {
             const result = await response.json();
 
             if (response.ok) {
-                setUser(prev => ({ ...prev, ...formData }));
-                // Update localStorage user info
-                const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-                localStorage.setItem('user', JSON.stringify({ ...storedUser, ...formData }));
+                dispatch(updateProfile(formData));
                 setMessage({ type: 'success', text: 'Profile updated successfully!' });
                 setEditing(false);
                 setTimeout(() => setMessage(null), 3000);

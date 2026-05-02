@@ -3,6 +3,8 @@ import Sidebar from '../components/Sidebar';
 import TopNavBar from '../components/TopNavBar';
 import { Loader2, CheckCircle, Shield, Bell, Globe, Sun, Moon, Key, Save, Copy, RefreshCw, X, Eye, EyeOff } from 'lucide-react';
 import { API_URL } from '../config';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTheme } from '../store/slices/uiSlice';
 
 const SettingToggle = ({ label, desc, checked, onChange, disabled }) => (
     <div className="flex items-center justify-between py-3">
@@ -25,6 +27,8 @@ const SettingToggle = ({ label, desc, checked, onChange, disabled }) => (
 );
 
 function Settings() {
+    const dispatch = useDispatch();
+    const theme = useSelector((state) => state.ui.theme);
     const [settings, setSettings] = useState({
         theme: 'dark',
         notifications: {
@@ -138,8 +142,9 @@ function Settings() {
     };
 
     // Theme toggle
-    const handleThemeChange = (theme) => {
-        setSettings(prev => ({ ...prev, theme }));
+    const handleThemeChange = (newTheme) => {
+        dispatch(setTheme(newTheme));
+        setSettings(prev => ({ ...prev, theme: newTheme }));
     };
 
     // Copy API key
@@ -233,8 +238,8 @@ function Settings() {
                     {/* Message Alert */}
                     {message && (
                         <div className={`p-4 rounded-xl flex items-center gap-3 ${message.type === 'success'
-                                ? 'bg-green-500/10 border border-green-500/20 text-green-400'
-                                : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                            ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+                            : 'bg-red-500/10 border border-red-500/20 text-red-400'
                             }`}>
                             <CheckCircle className="w-4 h-4" />
                             {message.text}
@@ -256,8 +261,8 @@ function Settings() {
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`px-2 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all border-b-2 ${activeTab === tab
-                                        ? 'text-indigo-400 border-indigo-500'
-                                        : 'text-slate-500 border-transparent hover:text-slate-300'
+                                    ? 'text-indigo-400 border-indigo-500'
+                                    : 'text-slate-500 border-transparent hover:text-slate-300'
                                     }`}
                             >
                                 {tab}
@@ -301,8 +306,8 @@ function Settings() {
                                                 <button
                                                     onClick={() => handleThemeChange('light')}
                                                     className={`px-5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${settings.theme === 'light'
-                                                            ? 'bg-white text-slate-900 shadow-lg'
-                                                            : 'text-slate-500 hover:text-white'
+                                                        ? 'bg-white text-slate-900 shadow-lg'
+                                                        : 'text-slate-500 hover:text-white'
                                                         }`}
                                                 >
                                                     <Sun className="w-3 h-3" /> Light
@@ -310,8 +315,8 @@ function Settings() {
                                                 <button
                                                     onClick={() => handleThemeChange('dark')}
                                                     className={`px-5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${settings.theme === 'dark'
-                                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                                                            : 'text-slate-500 hover:text-white'
+                                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                                                        : 'text-slate-500 hover:text-white'
                                                         }`}
                                                 >
                                                     <Moon className="w-3 h-3" /> Dark
