@@ -5,66 +5,45 @@ import { Mail, Lock, User, Shield, Zap, RefreshCw, Rocket, Sparkles, Hexagon } f
 import { API_URL } from '../config';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../store/slices/authSlice';
+import { useFormik } from 'formik';
+import { signupSchema } from '../utils/validationSchemas';
 
 
 function SignUp() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [formData, setFormData] = useState({
-        fullName: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
-        setError('');
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (formData.password !== formData.confirmPassword) {
-            return setError('Passwords do not match');
-        }
-
-        setLoading(true);
-        setError('');
-
-        try {
-            const response = await fetch(`${API_URL}/auth/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fullName: formData.fullName,
-                    email: formData.email,
-                    password: formData.password
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Registration failed');
+    const formik = useFormik({
+        initialValues: { fullName: '', email: '', password: '', confirmPassword: '' },
+        validationSchema: signupSchema,
+        onSubmit: async (values) => {
+            setLoading(true);
+            setError('');
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullName: values.fullName,
+                        email: values.email,
+                        password: values.password
+                    }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Registration failed');
+                if (data.token) {
+                    dispatch(loginSuccess({ token: data.token, user: data.user }));
+                }
+                navigate('/dashboard');
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
             }
-
-            if (data.token) {
-                dispatch(loginSuccess({ token: data.token, user: data.user }));
-            }
-
-            navigate('/dashboard');
-
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
+        },
+    });
 
     return (
         <div className="bg-[#050505] text-white font-inter min-h-screen flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
@@ -123,7 +102,7 @@ function SignUp() {
                             </p>
                         </header>
 
-                        <form className="space-y-6" onSubmit={handleSubmit}>
+                        <form className="space-y-6" onSubmit={formik.handleSubmit}>
                             {error && (
                                 <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
                                     {error}
@@ -139,10 +118,14 @@ function SignUp() {
                                         id="fullName"
                                         placeholder="John Doe"
                                         type="text"
-                                        value={formData.fullName}
-                                        onChange={handleChange}
+                                        value={formik.values.fullName}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
                                         required
                                     />
+                                    {formik.touched.fullName && formik.errors.fullName && (
+                                        <div className="text-red-500 text-sm mt-1">{formik.errors.fullName}</div>
+                                    )}
                                 </div>
                             </div>
 
@@ -155,10 +138,14 @@ function SignUp() {
                                         id="email"
                                         placeholder="name@company.com"
                                         type="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
+                                        value={formik.values.email}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
                                         required
                                     />
+                                    {formik.touched.email && formik.errors.email && (
+                                        <div className="text-red-500 text-sm mt-1">{formik.errors.email}</div>
+                                    )}
                                 </div>
                             </div>
 
@@ -170,12 +157,16 @@ function SignUp() {
                                         <input
                                             className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
                                             id="password"
-                                            placeholder="��������"
+                                            placeholder=""
                                             type="password"
-                                            value={formData.password}
-                                            onChange={handleChange}
+                                            value={formik.values.password}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
                                             required
                                         />
+                                        {formik.touched.password && formik.errors.password && (
+                                            <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="space-y-2">
@@ -185,12 +176,16 @@ function SignUp() {
                                         <input
                                             className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-white/20 py-4 pl-12 pr-4 rounded-xl text-white placeholder:text-white/10 outline-none transition-all"
                                             id="confirmPassword"
-                                            placeholder="��������"
+                                            placeholder=""
                                             type="password"
-                                            value={formData.confirmPassword}
-                                            onChange={handleChange}
+                                            value={formik.values.confirmPassword}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
                                             required
                                         />
+                                        {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                                            <div className="text-red-500 text-sm mt-1">{formik.errors.confirmPassword}</div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
