@@ -208,7 +208,7 @@ erDiagram
 ---
 
 ## 🔗 API Endpoints (45 Endpoints)
-> Full documentation available on [Postman](https://documenter.getpostman.com/view/your-workspace/paypilot-api).
+> Full documentation available on [Postman](https://documenter.getpostman.com/view/50840839/2sBXqKofPN).
 
 | Module | Core Endpoints |
 |:--- |:--- |
