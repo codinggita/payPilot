@@ -168,6 +168,42 @@ Users face **8 critical payment hurdles** that PayPilot solves elegantly:
   </tr>
 </table>
 
+---
+
+## 📊 Database Schema (7 Collections)
+
+```mermaid
+erDiagram
+    USER ||--o{ SUBSCRIPTION : "manages"
+    USER ||--o{ WALLET : "controls"
+    USER ||--o{ REWARD : "tracks"
+    USER ||--o{ TRANSACTION : "performs"
+    USER ||--o{ RECONCILIATION : "initiates"
+    USER ||--o{ SUGGESTION : "receives"
+
+    USER {
+        string id
+        string email
+        string password
+    }
+    TRANSACTION {
+        string id
+        string merchant
+        number amount
+        string category
+    }
+    SUBSCRIPTION {
+        string id
+        string merchant
+        number amount
+        date nextRenewal
+    }
+    
+    TRANSACTION ||--o{ RECONCILIATION : "matched in"
+    TRANSACTION ||--o{ SUBSCRIPTION : "billed to"
+    TRANSACTION ||--o{ REWARD : "generates"
+    SUGGESTION ||--o{ SUBSCRIPTION : "triggers"
+```
 
 ---
 
